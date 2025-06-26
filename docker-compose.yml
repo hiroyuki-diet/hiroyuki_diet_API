@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:14
+    container_name: hiroyuki_diet_postgres
+    volumes:
+      - hiroyuki_diet-db-store:/var/lib/postgresql/data
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+      POSTGRES_DB: "hiroyuki_diet"
+
+  app:
+    image: golang:1.24-alpine
+    container_name: hiroyuki_diet_app
+    working_dir: /go/src/app
+    tty: true
+    volumes:
+      - ./backend:/go/src/app
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_NAME: hiroyuki_diet
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  hiroyuki_diet-db-store: {}
