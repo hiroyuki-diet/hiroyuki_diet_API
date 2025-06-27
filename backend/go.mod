@@ -1,6 +1,6 @@
 module github.com/moXXcha/hiroyuki_diet_API
 
-go 1.24.0
+go 1.24
 
 require (
 	github.com/99designs/gqlgen v0.17.75
