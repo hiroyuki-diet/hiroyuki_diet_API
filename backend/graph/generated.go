@@ -140,11 +140,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Achievements  func(childComplexity int) int
-		Foods         func(childComplexity int) int
-		HiroyukiSkins func(childComplexity int) int
-		Items         func(childComplexity int) int
-		User          func(childComplexity int, id model.UUID, usingSkin *bool, voiceField []*model.InputFields) int
+		Foods func(childComplexity int) int
+		User  func(childComplexity int, id model.UUID, usingSkin *bool, voiceField []*model.InputFields) int
 	}
 
 	SignUpToken struct {
@@ -203,9 +200,6 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	User(ctx context.Context, id model.UUID, usingSkin *bool, voiceField []*model.InputFields) (*model.User, error)
-	Items(ctx context.Context) ([]*model.MasterItem, error)
-	HiroyukiSkins(ctx context.Context) ([]*model.MasterHiroyukiSkin, error)
-	Achievements(ctx context.Context) ([]*model.MasterAchievement, error)
 	Foods(ctx context.Context) ([]*model.Food, error)
 }
 type UserResolver interface {
@@ -683,33 +677,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Profile.Weight(childComplexity), true
 
-	case "Query.achievements":
-		if e.complexity.Query.Achievements == nil {
-			break
-		}
-
-		return e.complexity.Query.Achievements(childComplexity), true
-
 	case "Query.foods":
 		if e.complexity.Query.Foods == nil {
 			break
 		}
 
 		return e.complexity.Query.Foods(childComplexity), true
-
-	case "Query.hiroyukiSkins":
-		if e.complexity.Query.HiroyukiSkins == nil {
-			break
-		}
-
-		return e.complexity.Query.HiroyukiSkins(childComplexity), true
-
-	case "Query.items":
-		if e.complexity.Query.Items == nil {
-			break
-		}
-
-		return e.complexity.Query.Items(childComplexity), true
 
 	case "Query.user":
 		if e.complexity.Query.User == nil {
@@ -4072,176 +4045,6 @@ func (ec *executionContext) fieldContext_Query_user(ctx context.Context, field g
 	if fc.Args, err = ec.field_Query_user_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_items(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_items(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Items(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.MasterItem)
-	fc.Result = res
-	return ec.marshalNItem2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterItemᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_items(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Item_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Item_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Item_description(ctx, field)
-			case "itemImage":
-				return ec.fieldContext_Item_itemImage(ctx, field)
-			case "count":
-				return ec.fieldContext_Item_count(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_hiroyukiSkins(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_hiroyukiSkins(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().HiroyukiSkins(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.MasterHiroyukiSkin)
-	fc.Result = res
-	return ec.marshalNHiroyukiSkin2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterHiroyukiSkinᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_hiroyukiSkins(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_HiroyukiSkin_id(ctx, field)
-			case "name":
-				return ec.fieldContext_HiroyukiSkin_name(ctx, field)
-			case "description":
-				return ec.fieldContext_HiroyukiSkin_description(ctx, field)
-			case "part":
-				return ec.fieldContext_HiroyukiSkin_part(ctx, field)
-			case "skinImage":
-				return ec.fieldContext_HiroyukiSkin_skinImage(ctx, field)
-			case "releaseLevel":
-				return ec.fieldContext_HiroyukiSkin_releaseLevel(ctx, field)
-			case "isUsing":
-				return ec.fieldContext_HiroyukiSkin_isUsing(ctx, field)
-			case "isHaving":
-				return ec.fieldContext_HiroyukiSkin_isHaving(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type HiroyukiSkin", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_achievements(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_achievements(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Achievements(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.MasterAchievement)
-	fc.Result = res
-	return ec.marshalNAchievement2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterAchievementᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_achievements(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Achievement_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Achievement_name(ctx, field)
-			case "isClear":
-				return ec.fieldContext_Achievement_isClear(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Achievement", field.Name)
-		},
 	}
 	return fc, nil
 }
@@ -8428,72 +8231,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "items":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_items(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "hiroyukiSkins":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_hiroyukiSkins(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "achievements":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_achievements(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "foods":
 			field := field
 
@@ -9705,50 +9442,6 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) marshalNItem2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.MasterItem) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNItem2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterItem(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
 }
 
 func (ec *executionContext) marshalNItem2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterItem(ctx context.Context, sel ast.SelectionSet, v *model.MasterItem) graphql.Marshaler {

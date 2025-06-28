@@ -23,7 +23,8 @@ func (r *foodResolver) EstimateCalorie(ctx context.Context, obj *model.Food) (in
 
 // LastUsedDate is the resolver for the lastUsedDate field.
 func (r *foodResolver) LastUsedDate(ctx context.Context, obj *model.Food) (string, error) {
-	panic(fmt.Errorf("not implemented: LastUsedDate - lastUsedDate"))
+	date := obj.LastUsedDate.Format("2006-01-02")
+	return date, nil
 }
 
 // IsUsing is the resolver for the isUsing field.
@@ -111,24 +112,12 @@ func (r *queryResolver) User(ctx context.Context, id model.UUID, usingSkin *bool
 	panic(fmt.Errorf("not implemented: User - user"))
 }
 
-// Items is the resolver for the items field.
-func (r *queryResolver) Items(ctx context.Context) ([]*model.MasterItem, error) {
-	panic(fmt.Errorf("not implemented: Items - items"))
-}
-
-// HiroyukiSkins is the resolver for the hiroyukiSkins field.
-func (r *queryResolver) HiroyukiSkins(ctx context.Context) ([]*model.MasterHiroyukiSkin, error) {
-	panic(fmt.Errorf("not implemented: HiroyukiSkins - hiroyukiSkins"))
-}
-
-// Achievements is the resolver for the achievements field.
-func (r *queryResolver) Achievements(ctx context.Context) ([]*model.MasterAchievement, error) {
-	panic(fmt.Errorf("not implemented: Achievements - achievements"))
-}
-
 // Foods is the resolver for the foods field.
 func (r *queryResolver) Foods(ctx context.Context) ([]*model.Food, error) {
-	panic(fmt.Errorf("not implemented: Foods - foods"))
+	db := r.DB
+	food := model.Food{}
+	foods, err := food.GetAll(db)
+	return foods, err
 }
 
 // Profile is the resolver for the profile field.
@@ -198,3 +187,21 @@ type mealResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *queryResolver) Items(ctx context.Context) ([]*model.MasterItem, error) {
+	panic(fmt.Errorf("not implemented: Items - items"))
+}
+func (r *queryResolver) HiroyukiSkins(ctx context.Context) ([]*model.MasterHiroyukiSkin, error) {
+	panic(fmt.Errorf("not implemented: HiroyukiSkins - hiroyukiSkins"))
+}
+func (r *queryResolver) Achievements(ctx context.Context) ([]*model.MasterAchievement, error) {
+	panic(fmt.Errorf("not implemented: Achievements - achievements"))
+}
+*/
