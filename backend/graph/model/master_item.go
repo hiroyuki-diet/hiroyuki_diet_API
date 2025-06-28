@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -33,20 +32,4 @@ func (*MasterItem) FirstCreate(db *gorm.DB) error {
 		}
 	}
 	return nil
-}
-
-func (*MasterItem) GetAll(db *gorm.DB) ([]*MasterItem, error) {
-	var items []*MasterItem
-
-	if db == nil {
-		return nil, fmt.Errorf("db is nil")
-	}
-
-	result := db.Find(&items)
-
-	if result.Error != nil {
-		return nil, result.Error
-	}
-
-	return items, nil
 }
