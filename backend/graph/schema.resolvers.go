@@ -23,7 +23,8 @@ func (r *foodResolver) EstimateCalorie(ctx context.Context, obj *model.Food) (in
 
 // LastUsedDate is the resolver for the lastUsedDate field.
 func (r *foodResolver) LastUsedDate(ctx context.Context, obj *model.Food) (string, error) {
-	panic(fmt.Errorf("not implemented: LastUsedDate - lastUsedDate"))
+	date := obj.LastUsedDate.Format("2006-01-02")
+	return date, nil
 }
 
 // IsUsing is the resolver for the isUsing field.
