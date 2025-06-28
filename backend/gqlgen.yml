@@ -121,7 +121,7 @@ call_argument_directives_with_null: true
 # gqlgen will search for any type names in the schema in these go packages
 # if they match it will use them, otherwise it will generate them.
 autobind:
-#  - "github.com/moXXcha/hiroyuki_diet_API/graph/model"
+  - "github.com/moXXcha/hiroyuki_diet_API/graph/model"
 
 # This section declares type mapping between the GraphQL and go type systems
 #
@@ -131,29 +131,70 @@ autobind:
 models:
   ID:
     model:
-      - github.com/99designs/gqlgen/graphql.ID
-      - github.com/99designs/gqlgen/graphql.Int
-      - github.com/99designs/gqlgen/graphql.Int64
-      - github.com/99designs/gqlgen/graphql.Int32
-  # gqlgen provides a default GraphQL UUID convenience wrapper for github.com/google/uuid 
-  # but you can override this to provide your own GraphQL UUID implementation
-  UUID:
-    model:
-      - github.com/99designs/gqlgen/graphql.UUID
-
-  # The GraphQL spec explicitly states that the Int type is a signed 32-bit
-  # integer. Using Go int or int64 to represent it can lead to unexpected
-  # behavior, and some GraphQL tools like Apollo Router will fail when
-  # communicating numbers that overflow 32-bits.
-  #
-  # You may choose to use the custom, built-in Int64 scalar to represent 64-bit
-  # integers, or ignore the spec and bind Int to graphql.Int / graphql.Int64
-  # (the default behavior of gqlgen). This is fine in simple use cases when you
-  # do not need to worry about interoperability and only expect small numbers.
+      - github.com/moXXcha/hiroyuki_diet_API/graph/model.UUID
   Int:
     model:
-      - github.com/99designs/gqlgen/graphql.Int32
-  Int64:
-    model:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
+      - github.com/99designs/gqlgen/graphql.Int32
+  FieldEnum:
+    model: github.com/moXXcha/hiroyuki_diet_API/utils.Field
+  SkinPartEnum:
+    model: github.com/moXXcha/hiroyuki_diet_API/utils.SkinPart
+  MealTypeEnum:
+    model: github.com/moXXcha/hiroyuki_diet_API/utils.MealType
+  GenderEnum:
+    model: github.com/moXXcha/hiroyuki_diet_API/utils.Gender
+  User:
+    model: github.com/moXXcha/hiroyuki_diet_API/graph/model.User
+    fields:
+      profile:
+        resolver: true
+      exercisies:
+        resolver: true
+      meals:
+        resolver: true
+      items:
+        resolver: true
+      hiroyukiSkins:
+        resolver: true
+      achievements:
+        resolver: true
+      hiroyukiVocies:
+        resolver: true
+  HiroyukiVocie:
+    model: github.com/moXXcha/hiroyuki_diet_API/graph/model.MasterHiroyukiVoice
+    fields:
+      fields:
+        resolver: true
+      isHaving:
+        resolver: true
+  Field:
+    model: github.com/moXXcha/hiroyuki_diet_API/graph/model.MasterField
+  Achievement:
+    model: github.com/moXXcha/hiroyuki_diet_API/graph/model.MasterAchievement
+    fields:
+      isClear:
+        resolver: true
+  HiroyukiSkin:
+    model: github.com/moXXcha/hiroyuki_diet_API/graph/model.MasterHiroyukiSkin
+    fields:
+      isUsing:
+        resolver: true
+      isHaving:
+        resolver: true
+  Item:
+    model: github.com/moXXcha/hiroyuki_diet_API/graph/model.MasterItem
+    fields:
+      count:
+        resolver: true
+
+    # The GraphQL spec explicitly states that the Int type is a signed 32-bit
+    # integer. Using Go int or int64 to represent it can lead to unexpected
+    # behavior, and some GraphQL tools like Apollo Router will fail when
+    # communicating numbers that overflow 32-bits.
+    #
+    # You may choose to use the custom, built-in Int64 scalar to represent 64-bit
+    # integers, or ignore the spec and bind Int to graphql.Int / graphql.Int64
+    # (the default behavior of gqlgen). This is fine in simple use cases when you
+    # do not need to worry about interoperability and only expect small numbers.
