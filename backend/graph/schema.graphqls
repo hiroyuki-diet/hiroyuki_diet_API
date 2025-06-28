@@ -1,3 +1,193 @@
 # GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
+enum FieldEnum {
+  LOGIN
+  SIGNIN
+  HOME
+  MEAL
+  MEAL_FORM
+  MEAL_EDIT
+  DATA
+  PROFILE
+  PROFILE_EDIT
+  EXERCISE
+  EEXERCISE_COMPLETE
+  ACHIEVEMENT
+  ACHIEVEMENT_COMPLETE
+  CHIBI_HIROYUKI
+}
+enum SkinPartEnum {
+  HEAD
+  FACE
+  BODY
+}
+
+enum MealTypeEnum {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACKING
+}
+
+enum GenderEnum {
+  MAN
+  WOMAN
+}
+type Query {
+  user(id: ID!, usingSkin: Boolean, voiceField: [InputFields!]): User!
+  items: [Item!]!
+  hiroyukiSkins: [HiroyukiSkin!]!
+  achievements: [Achievement!]!
+  foods: [Food!]!
+}
+
+type Mutation {
+  signUp(input: Auth!): String!
+  login(input: Auth!): String!
+  logout(input: ID!): ID!
+  createExercise(input: InputExercise!): ID!
+  editExercise(input: InputExercise!): ID!
+  receiptAchievement(input: ID!): ID!
+  createProfile(input: InputProfile!): ID!
+  editProfile(input: InputProfile!): ID!
+  createMeal(input: InputMeal!): ID!
+  editMeal(input: InputMeal!): ID!
+  postSkin(input: ID!): ID!
+  useItem(input: ID!): ID!
+}
+input UseItem {
+  id: ID!
+  count: Int!
+}
+
+input Auth {
+  email: String!
+  password: String!
+}
+input InputExercise {
+  id: ID
+  time: Int!
+}
+input InputProfile {
+  id: ID
+  name: String!
+  description: String
+  age: Int!
+  gender: String!
+  weight: Int!
+  height: Int!
+  targetWeight: Int!
+  targetDailyExerciseTime: Int!
+  targetDailyCarorie: Int!
+}
+input InputMeal {
+  id: ID
+  mealType: MealTypeEnum!
+  foods: [InputFood!]!
+}
+
+input InputFood {
+  id: ID!
+  name: String!
+  estimateCalorie: Int!
+  lastUsedDate: String!
+}
+input InputFields {
+  fields: [FieldInput!]!
+}
+input FieldInput {
+  id: ID!
+  field: FieldEnum!
+}
+
+type User {
+  id: ID!
+  email: String!
+  profile: Profile!
+  level: Int!
+  signUpToken: SignUpToken!
+  isTokenAuthenticated: Boolean!
+  experiencePoInt: Int!
+  exercisies: [Exercise!]
+  meals: [Meal!]
+  items: [Item!]
+  hiroyukiSkins: [HiroyukiSkin!]!
+  achievements: [Achievement!]!
+  hiroyukiVoicies: [HiroyukiVoice!]!
+}
+
+type HiroyukiVoice {
+  id: ID!
+  voiceUrl: String!
+  releaseLevel: Int!
+  fields: [Field!]!
+  isHaving: Boolean!
+}
+type Field {
+  id: ID!
+  field: FieldEnum!
+}
+
+type Achievement {
+  id: ID!
+  name: String!
+  isClear: Boolean!
+}
+
+type HiroyukiSkin {
+  id: ID!
+  name: String!
+  description: String!
+  part: SkinPartEnum!
+  skinImage: String!
+  releaseLevel: Int!
+  isUsing: Boolean!
+  isHaving: Boolean!
+}
+
+type Item {
+  id: ID!
+  name: String!
+  description: String!
+  itemImage: String!
+  count: Int!
+}
+
+type Meal {
+  id: ID!
+  mealType: MealTypeEnum!
+  totalCalorie: Int!
+  foods: [Food!]!
+}
+
+type SignUpToken {
+  id: ID!
+  token: Int!
+  surviveTime: Int!
+}
+
+type Exercise {
+  id: ID!
+  time: Int!
+}
+
+type Profile {
+  id: ID!
+  userName: String!
+  age: Int!
+  gender: GenderEnum!
+  weight: Int!
+  height: Int!
+  targetWeight: Int!
+  targetDailyExerciseTime: Int!
+  targetDailyCarorie: Int!
+  isCreated: Boolean!
+}
+
+type Food {
+  id: ID!
+  name: String!
+  estimateCalorie: Int!
+  lastUsedDate: String!
+}

@@ -3,16 +3,15 @@ package model
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type User struct {
-	Id                   uuid.UUID      `gorm:"primary_key; type: uuid; not null; default:uuid_generate_v4()"`
+	Id                   UUID           `gorm:"primary_key; type: uuid; not null; default:uuid_generate_v4()"`
 	Email                string         `gorm:"type: varchar(50); not null"`
 	Password             string         `gorm:"type: text; not null"`
 	Level                int            `gorm:"type: int; not null"`
-	SignUpTokenId        uuid.UUID      `gorm:"type: uuid; not null"`
+	SignUpTokenId        UUID           `gorm:"type: uuid; not null"`
 	SignUpToken          SignUpToken    `gorm:"foreignKey:SignUpTokenId;references:Id"`
 	IsTokenAuthenticated bool           `gorm:"type: bool; not null; default: false"`
 	ExperiencePoint      int            `gorm:"type: int; not null; default: 0"`

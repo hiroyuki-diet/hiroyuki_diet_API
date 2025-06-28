@@ -3,21 +3,20 @@ package model
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/moXXcha/hiroyuki_diet_API/utils"
 	"gorm.io/gorm"
 )
 
-type MasterFields struct {
-	Id        uuid.UUID      `gorm:"primary_key; type: uuid; not null; default:uuid_generate_v4()"`
+type MasterField struct {
+	Id        UUID           `gorm:"primary_key; type: uuid; not null; default:uuid_generate_v4()"`
 	Field     utils.Field    `gorm:"type: field; not null"`
 	CreatedAt time.Time      `gorm:"type: timestamp; autoCreateTime; not null; default:CURRENT_TIMESTAMP;<-:create"`
 	UpdatedAt time.Time      `gorm:"type: timestamp; autoUpdateTime;<-:update"`
 	DeletedAt gorm.DeletedAt `gorm:"type: timestamp; index"`
 }
 
-func (*MasterFields) FirstCreate(db *gorm.DB) error {
-	fields := []MasterFields{
+func (*MasterField) FirstCreate(db *gorm.DB) error {
+	fields := []MasterField{
 		{
 			Field: "login",
 		},
@@ -63,7 +62,7 @@ func (*MasterFields) FirstCreate(db *gorm.DB) error {
 	}
 
 	for i := range fields {
-		result := db.FirstOrCreate(&fields[i], MasterFields{Field: fields[i].Field})
+		result := db.FirstOrCreate(&fields[i], MasterField{Field: fields[i].Field})
 		if result.Error != nil {
 			return result.Error
 		}
