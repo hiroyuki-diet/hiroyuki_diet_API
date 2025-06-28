@@ -2,5 +2,70 @@
 
 package model
 
+import (
+	"github.com/moXXcha/hiroyuki_diet_API/utils"
+)
+
+type Auth struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type FieldInput struct {
+	ID    UUID        `json:"id"`
+	Field utils.Field `json:"field"`
+}
+
+type HiroyukiVoice struct {
+	ID           UUID           `json:"id"`
+	VoiceURL     string         `json:"voiceUrl"`
+	ReleaseLevel int            `json:"releaseLevel"`
+	Fields       []*MasterField `json:"fields"`
+	IsHaving     bool           `json:"isHaving"`
+}
+
+type InputExercise struct {
+	ID   *UUID `json:"id,omitempty"`
+	Time int   `json:"time"`
+}
+
+type InputFields struct {
+	Fields []*FieldInput `json:"fields"`
+}
+
+type InputFood struct {
+	ID              UUID   `json:"id"`
+	Name            string `json:"name"`
+	EstimateCalorie int    `json:"estimateCalorie"`
+	LastUsedDate    string `json:"lastUsedDate"`
+}
+
+type InputMeal struct {
+	ID       *UUID          `json:"id,omitempty"`
+	MealType utils.MealType `json:"mealType"`
+	Foods    []*InputFood   `json:"foods"`
+}
+
+type InputProfile struct {
+	ID                      *UUID   `json:"id,omitempty"`
+	Name                    string  `json:"name"`
+	Description             *string `json:"description,omitempty"`
+	Age                     int     `json:"age"`
+	Gender                  string  `json:"gender"`
+	Weight                  int     `json:"weight"`
+	Height                  int     `json:"height"`
+	TargetWeight            int     `json:"targetWeight"`
+	TargetDailyExerciseTime int     `json:"targetDailyExerciseTime"`
+	TargetDailyCarorie      int     `json:"targetDailyCarorie"`
+}
+
+type Mutation struct {
+}
+
 type Query struct {
+}
+
+type UseItem struct {
+	ID    UUID `json:"id"`
+	Count int  `json:"count"`
 }
