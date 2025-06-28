@@ -121,7 +121,10 @@ func (r *queryResolver) Items(ctx context.Context) ([]*model.MasterItem, error) 
 
 // HiroyukiSkins is the resolver for the hiroyukiSkins field.
 func (r *queryResolver) HiroyukiSkins(ctx context.Context) ([]*model.MasterHiroyukiSkin, error) {
-	panic(fmt.Errorf("not implemented: HiroyukiSkins - hiroyukiSkins"))
+	db := r.DB
+	skin := model.MasterHiroyukiSkin{}
+	skins, err := skin.GetAll(db)
+	return skins, err
 }
 
 // Achievements is the resolver for the achievements field.
