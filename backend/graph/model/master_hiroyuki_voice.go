@@ -3,16 +3,15 @@ package model
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type MasterHiroyukiVoice struct {
-	Id           uuid.UUID      `gorm:"primary_key; type: uuid; not null; default:uuid_generate_v4()"`
+	Id           UUID           `gorm:"primary_key; type: uuid; not null; default:uuid_generate_v4()"`
 	Name         string         `gorm:"type: varchar(50); not null"`
 	VoiceUrl     string         `gorm:"type: varchar(50); not null"`
 	ReleaseLevel int            `gorm:"type: int; not null"`
-	VoiceFields  []MasterFields `gorm:"many2many:voice_fields"`
+	VoiceFields  []MasterField  `gorm:"many2many:voice_fields"`
 	CreatedAt    time.Time      `gorm:"type: timestamp; autoCreateTime; not null; default:CURRENT_TIMESTAMP;<-:create"`
 	UpdatedAt    time.Time      `gorm:"type: timestamp; autoUpdateTime;<-:update"`
 	DeletedAt    gorm.DeletedAt `gorm:"type: timestamp; index"`
@@ -24,7 +23,7 @@ func (*MasterHiroyukiVoice) FirstCreate(db *gorm.DB) error {
 			Name:         "よろしく",
 			VoiceUrl:     "",
 			ReleaseLevel: 0,
-			VoiceFields: []MasterFields{{
+			VoiceFields: []MasterField{{
 				Field: "home",
 			}, {
 				Field: "chibi_hiroyuki",
