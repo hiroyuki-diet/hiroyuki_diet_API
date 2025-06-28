@@ -3,13 +3,12 @@ package model
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/moXXcha/hiroyuki_diet_API/utils"
 	"gorm.io/gorm"
 )
 
 type MasterHiroyukiSkin struct {
-	Id           uuid.UUID      `gorm:"primary_key; type: uuid; not null; default:uuid_generate_v4()"`
+	Id           UUID           `gorm:"primary_key; type: uuid; not null; default:uuid_generate_v4()"`
 	Name         string         `gorm:"type: varchar(50); not null"`
 	Part         utils.SkinPart `gorm:"type: skin_part; not null"`
 	SkinImage    string         `gorm:"type: varchar(50); not null"`

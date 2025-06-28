@@ -3,14 +3,13 @@ package model
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/moXXcha/hiroyuki_diet_API/utils"
 	"gorm.io/gorm"
 )
 
 type Profile struct {
-	Id                      uuid.UUID      `gorm:"primary_key; type: uuid; not null; default:uuid_generate_v4()"`
-	UserId                  uuid.UUID      `gorm:"type: uuid; not null"`
+	Id                      UUID           `gorm:"primary_key; type: uuid; not null; default:uuid_generate_v4()"`
+	UserId                  UUID           `gorm:"type: uuid; not null"`
 	User                    User           `gorm:"foreignKey:UserId;references:Id"`
 	UserName                string         `gorm:"type: varchar(50); not null"`
 	Age                     int            `gorm:"type: int; not null"`

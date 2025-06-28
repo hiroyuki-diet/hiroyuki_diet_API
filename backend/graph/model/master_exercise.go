@@ -3,12 +3,11 @@ package model
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type MasterExercise struct {
-	Id        uuid.UUID      `gorm:"primary_key; type: uuid; not null; default:uuid_generate_v4()"`
+	Id        UUID           `gorm:"primary_key; type: uuid; not null; default:uuid_generate_v4()"`
 	Name      string         `gorm:"type: varchar(50); not null"`
 	Mets      int            `gorm:"type: int; not null"`
 	CreatedAt time.Time      `gorm:"type: timestamp; autoCreateTime; not null; default:CURRENT_TIMESTAMP;<-:create"`
