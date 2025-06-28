@@ -36,9 +36,6 @@ enum GenderEnum {
 }
 type Query {
   user(id: ID!, usingSkin: Boolean, voiceField: [InputFields!]): User!
-  items: [Item!]!
-  hiroyukiSkins: [HiroyukiSkin!]!
-  achievements: [Achievement!]!
   foods: [Food!]!
 }
 
