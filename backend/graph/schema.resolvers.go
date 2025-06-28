@@ -113,18 +113,12 @@ func (r *queryResolver) User(ctx context.Context, id model.UUID, usingSkin *bool
 
 // Items is the resolver for the items field.
 func (r *queryResolver) Items(ctx context.Context) ([]*model.MasterItem, error) {
-	db := r.DB
-	item := model.MasterItem{}
-	items, err := item.GetAll(db)
-	return items, err
+	panic(fmt.Errorf("not implemented: Items - items"))
 }
 
 // HiroyukiSkins is the resolver for the hiroyukiSkins field.
 func (r *queryResolver) HiroyukiSkins(ctx context.Context) ([]*model.MasterHiroyukiSkin, error) {
-	db := r.DB
-	skin := model.MasterHiroyukiSkin{}
-	skins, err := skin.GetAll(db)
-	return skins, err
+	panic(fmt.Errorf("not implemented: HiroyukiSkins - hiroyukiSkins"))
 }
 
 // Achievements is the resolver for the achievements field.

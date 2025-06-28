@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/moXXcha/hiroyuki_diet_API/utils"
@@ -52,20 +51,4 @@ func (*MasterHiroyukiSkin) FirstCreate(db *gorm.DB) error {
 		}
 	}
 	return nil
-}
-
-func (*MasterHiroyukiSkin) GetAll(db *gorm.DB) ([]*MasterHiroyukiSkin, error) {
-	var skins []*MasterHiroyukiSkin
-
-	if db == nil {
-		return nil, fmt.Errorf("db is nil")
-	}
-
-	result := db.Find(&skins)
-
-	if result.Error != nil {
-		return nil, result.Error
-	}
-
-	return skins, nil
 }
