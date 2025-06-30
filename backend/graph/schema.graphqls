@@ -180,6 +180,7 @@ type Profile {
   targetDailyExerciseTime: Int!
   targetDailyCarorie: Int!
   isCreated: Boolean!
+  favorability: Int
 }
 
 type Food {
