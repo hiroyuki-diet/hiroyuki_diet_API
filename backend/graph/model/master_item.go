@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -32,4 +33,23 @@ func (*MasterItem) FirstCreate(db *gorm.DB) error {
 		}
 	}
 	return nil
+}
+
+func (*MasterItem) GetAllByUserId(id UUID, db *gorm.DB) ([]*ItemResponse, error) {
+	var responses []*ItemResponse
+
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	err := db.Table("master_items").
+		Select(`master_items.id as id, master_items.name, master_items.description, 
+	        COALESCE(user_items.count, 0) as count`).
+		Joins("LEFT JOIN user_items ON user_items.item_id = master_items.id AND user_items.user_id = ?", id).
+		Scan(&responses).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return responses, nil
 }
