@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -18,4 +19,20 @@ type User struct {
 	CreatedAt            time.Time      `gorm:"type: timestamp; autoCreateTime; not null; default:CURRENT_TIMESTAMP;<-:create"`
 	UpdatedAt            time.Time      `gorm:"type: timestamp; autoUpdateTime;<-:update"`
 	DeletedAt            gorm.DeletedAt `gorm:"type: timestamp; index"`
+}
+
+func (*User) GetInfo(id UUID, db *gorm.DB) (*User, error) {
+	var user *User
+
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	result := db.Preload("SignUpToken").First(&user)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return user, nil
 }

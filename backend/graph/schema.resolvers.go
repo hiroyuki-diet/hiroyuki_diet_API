@@ -104,7 +104,10 @@ func (r *mutationResolver) UseItem(ctx context.Context, input model.UUID) (model
 
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, id model.UUID, usingSkin *bool, voiceField []*model.InputFields) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
+	db := r.DB
+	user := model.User{}
+	userInfo, err := user.GetInfo(id, db)
+	return userInfo, err
 }
 
 // Foods is the resolver for the foods field.
