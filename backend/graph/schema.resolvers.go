@@ -32,11 +32,6 @@ func (r *hiroyukiSkinResolver) IsHaving(ctx context.Context, obj *model.MasterHi
 	panic(fmt.Errorf("not implemented: IsHaving - isHaving"))
 }
 
-// Count is the resolver for the count field.
-func (r *itemResolver) Count(ctx context.Context, obj *model.MasterItem) (int, error) {
-	panic(fmt.Errorf("not implemented: Count - count"))
-}
-
 // TotalCalorie is the resolver for the totalCalorie field.
 func (r *mealResolver) TotalCalorie(ctx context.Context, obj *model.Meal) (int, error) {
 	panic(fmt.Errorf("not implemented: TotalCalorie - totalCalorie"))
@@ -137,8 +132,11 @@ func (r *userResolver) Meals(ctx context.Context, obj *model.User) ([]*model.Mea
 }
 
 // Items is the resolver for the items field.
-func (r *userResolver) Items(ctx context.Context, obj *model.User) ([]*model.MasterItem, error) {
-	panic(fmt.Errorf("not implemented: Items - items"))
+func (r *userResolver) Items(ctx context.Context, obj *model.User) ([]*model.ItemResponse, error) {
+	db := r.DB
+	itemModel := model.MasterItem{}
+	items, err := itemModel.GetAllByUserId(obj.Id, db)
+	return items, err
 }
 
 // HiroyukiSkins is the resolver for the hiroyukiSkins field.
@@ -165,9 +163,6 @@ func (r *Resolver) Food() FoodResolver { return &foodResolver{r} }
 // HiroyukiSkin returns HiroyukiSkinResolver implementation.
 func (r *Resolver) HiroyukiSkin() HiroyukiSkinResolver { return &hiroyukiSkinResolver{r} }
 
-// Item returns ItemResolver implementation.
-func (r *Resolver) Item() ItemResolver { return &itemResolver{r} }
-
 // Meal returns MealResolver implementation.
 func (r *Resolver) Meal() MealResolver { return &mealResolver{r} }
 
@@ -183,8 +178,27 @@ func (r *Resolver) User() UserResolver { return &userResolver{r} }
 type achievementResolver struct{ *Resolver }
 type foodResolver struct{ *Resolver }
 type hiroyukiSkinResolver struct{ *Resolver }
-type itemResolver struct{ *Resolver }
 type mealResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *itemResolver) Name(ctx context.Context, obj *model.UserItem) (string, error) {
+	panic(fmt.Errorf("not implemented: Name - name"))
+}
+func (r *itemResolver) Description(ctx context.Context, obj *model.UserItem) (string, error) {
+	panic(fmt.Errorf("not implemented: Description - description"))
+}
+func (r *itemResolver) ItemImage(ctx context.Context, obj *model.UserItem) (string, error) {
+	panic(fmt.Errorf("not implemented: ItemImage - itemImage"))
+}
+func (r *Resolver) Item() ItemResolver { return &itemResolver{r} }
+type itemResolver struct{ *Resolver }
+*/

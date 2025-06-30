@@ -43,7 +43,6 @@ type ResolverRoot interface {
 	Achievement() AchievementResolver
 	Food() FoodResolver
 	HiroyukiSkin() HiroyukiSkinResolver
-	Item() ItemResolver
 	Meal() MealResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
@@ -96,7 +95,7 @@ type ComplexityRoot struct {
 		VoiceURL     func(childComplexity int) int
 	}
 
-	Item struct {
+	ItemResponse struct {
 		Count       func(childComplexity int) int
 		Description func(childComplexity int) int
 		Id          func(childComplexity int) int
@@ -178,9 +177,6 @@ type HiroyukiSkinResolver interface {
 	IsUsing(ctx context.Context, obj *model.MasterHiroyukiSkin) (bool, error)
 	IsHaving(ctx context.Context, obj *model.MasterHiroyukiSkin) (bool, error)
 }
-type ItemResolver interface {
-	Count(ctx context.Context, obj *model.MasterItem) (int, error)
-}
 type MealResolver interface {
 	TotalCalorie(ctx context.Context, obj *model.Meal) (int, error)
 }
@@ -207,7 +203,7 @@ type UserResolver interface {
 
 	Exercisies(ctx context.Context, obj *model.User) ([]*model.Exercise, error)
 	Meals(ctx context.Context, obj *model.User) ([]*model.Meal, error)
-	Items(ctx context.Context, obj *model.User) ([]*model.MasterItem, error)
+	Items(ctx context.Context, obj *model.User) ([]*model.ItemResponse, error)
 	HiroyukiSkins(ctx context.Context, obj *model.User) ([]*model.MasterHiroyukiSkin, error)
 	Achievements(ctx context.Context, obj *model.User) ([]*model.MasterAchievement, error)
 	HiroyukiVoicies(ctx context.Context, obj *model.User) ([]*model.HiroyukiVoice, error)
@@ -400,40 +396,40 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.HiroyukiVoice.VoiceURL(childComplexity), true
 
-	case "Item.count":
-		if e.complexity.Item.Count == nil {
+	case "ItemResponse.count":
+		if e.complexity.ItemResponse.Count == nil {
 			break
 		}
 
-		return e.complexity.Item.Count(childComplexity), true
+		return e.complexity.ItemResponse.Count(childComplexity), true
 
-	case "Item.description":
-		if e.complexity.Item.Description == nil {
+	case "ItemResponse.description":
+		if e.complexity.ItemResponse.Description == nil {
 			break
 		}
 
-		return e.complexity.Item.Description(childComplexity), true
+		return e.complexity.ItemResponse.Description(childComplexity), true
 
-	case "Item.id":
-		if e.complexity.Item.Id == nil {
+	case "ItemResponse.id":
+		if e.complexity.ItemResponse.Id == nil {
 			break
 		}
 
-		return e.complexity.Item.Id(childComplexity), true
+		return e.complexity.ItemResponse.Id(childComplexity), true
 
-	case "Item.itemImage":
-		if e.complexity.Item.ItemImage == nil {
+	case "ItemResponse.itemImage":
+		if e.complexity.ItemResponse.ItemImage == nil {
 			break
 		}
 
-		return e.complexity.Item.ItemImage(childComplexity), true
+		return e.complexity.ItemResponse.ItemImage(childComplexity), true
 
-	case "Item.name":
-		if e.complexity.Item.Name == nil {
+	case "ItemResponse.name":
+		if e.complexity.ItemResponse.Name == nil {
 			break
 		}
 
-		return e.complexity.Item.Name(childComplexity), true
+		return e.complexity.ItemResponse.Name(childComplexity), true
 
 	case "Meal.foods":
 		if e.complexity.Meal.Foods == nil {
@@ -2467,8 +2463,8 @@ func (ec *executionContext) fieldContext_HiroyukiVoice_isHaving(_ context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Item_id(ctx context.Context, field graphql.CollectedField, obj *model.MasterItem) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Item_id(ctx, field)
+func (ec *executionContext) _ItemResponse_id(ctx context.Context, field graphql.CollectedField, obj *model.ItemResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ItemResponse_id(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2498,9 +2494,9 @@ func (ec *executionContext) _Item_id(ctx context.Context, field graphql.Collecte
 	return ec.marshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Item_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ItemResponse_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Item",
+		Object:     "ItemResponse",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2511,8 +2507,8 @@ func (ec *executionContext) fieldContext_Item_id(_ context.Context, field graphq
 	return fc, nil
 }
 
-func (ec *executionContext) _Item_name(ctx context.Context, field graphql.CollectedField, obj *model.MasterItem) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Item_name(ctx, field)
+func (ec *executionContext) _ItemResponse_name(ctx context.Context, field graphql.CollectedField, obj *model.ItemResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ItemResponse_name(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2542,9 +2538,9 @@ func (ec *executionContext) _Item_name(ctx context.Context, field graphql.Collec
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Item_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ItemResponse_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Item",
+		Object:     "ItemResponse",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2555,8 +2551,8 @@ func (ec *executionContext) fieldContext_Item_name(_ context.Context, field grap
 	return fc, nil
 }
 
-func (ec *executionContext) _Item_description(ctx context.Context, field graphql.CollectedField, obj *model.MasterItem) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Item_description(ctx, field)
+func (ec *executionContext) _ItemResponse_description(ctx context.Context, field graphql.CollectedField, obj *model.ItemResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ItemResponse_description(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2586,9 +2582,9 @@ func (ec *executionContext) _Item_description(ctx context.Context, field graphql
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Item_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ItemResponse_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Item",
+		Object:     "ItemResponse",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2599,8 +2595,8 @@ func (ec *executionContext) fieldContext_Item_description(_ context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Item_itemImage(ctx context.Context, field graphql.CollectedField, obj *model.MasterItem) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Item_itemImage(ctx, field)
+func (ec *executionContext) _ItemResponse_itemImage(ctx context.Context, field graphql.CollectedField, obj *model.ItemResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ItemResponse_itemImage(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2630,9 +2626,9 @@ func (ec *executionContext) _Item_itemImage(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Item_itemImage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ItemResponse_itemImage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Item",
+		Object:     "ItemResponse",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2643,8 +2639,8 @@ func (ec *executionContext) fieldContext_Item_itemImage(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Item_count(ctx context.Context, field graphql.CollectedField, obj *model.MasterItem) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Item_count(ctx, field)
+func (ec *executionContext) _ItemResponse_count(ctx context.Context, field graphql.CollectedField, obj *model.ItemResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ItemResponse_count(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2657,7 +2653,7 @@ func (ec *executionContext) _Item_count(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Item().Count(rctx, obj)
+		return obj.Count, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2674,12 +2670,12 @@ func (ec *executionContext) _Item_count(ctx context.Context, field graphql.Colle
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Item_count(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ItemResponse_count(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Item",
+		Object:     "ItemResponse",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
@@ -4875,9 +4871,9 @@ func (ec *executionContext) _User_items(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.MasterItem)
+	res := resTmp.([]*model.ItemResponse)
 	fc.Result = res
-	return ec.marshalOItem2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterItemᚄ(ctx, field.Selections, res)
+	return ec.marshalOItemResponse2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐItemResponseᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_items(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4889,17 +4885,17 @@ func (ec *executionContext) fieldContext_User_items(_ context.Context, field gra
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Item_id(ctx, field)
+				return ec.fieldContext_ItemResponse_id(ctx, field)
 			case "name":
-				return ec.fieldContext_Item_name(ctx, field)
+				return ec.fieldContext_ItemResponse_name(ctx, field)
 			case "description":
-				return ec.fieldContext_Item_description(ctx, field)
+				return ec.fieldContext_ItemResponse_description(ctx, field)
 			case "itemImage":
-				return ec.fieldContext_Item_itemImage(ctx, field)
+				return ec.fieldContext_ItemResponse_itemImage(ctx, field)
 			case "count":
-				return ec.fieldContext_Item_count(ctx, field)
+				return ec.fieldContext_ItemResponse_count(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type ItemResponse", field.Name)
 		},
 	}
 	return fc, nil
@@ -7824,73 +7820,42 @@ func (ec *executionContext) _HiroyukiVoice(ctx context.Context, sel ast.Selectio
 	return out
 }
 
-var itemImplementors = []string{"Item"}
+var itemResponseImplementors = []string{"ItemResponse"}
 
-func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj *model.MasterItem) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, itemImplementors)
+func (ec *executionContext) _ItemResponse(ctx context.Context, sel ast.SelectionSet, obj *model.ItemResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, itemResponseImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("Item")
+			out.Values[i] = graphql.MarshalString("ItemResponse")
 		case "id":
-			out.Values[i] = ec._Item_id(ctx, field, obj)
+			out.Values[i] = ec._ItemResponse_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "name":
-			out.Values[i] = ec._Item_name(ctx, field, obj)
+			out.Values[i] = ec._ItemResponse_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "description":
-			out.Values[i] = ec._Item_description(ctx, field, obj)
+			out.Values[i] = ec._ItemResponse_description(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "itemImage":
-			out.Values[i] = ec._Item_itemImage(ctx, field, obj)
+			out.Values[i] = ec._ItemResponse_itemImage(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "count":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Item_count(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
+			out.Values[i] = ec._ItemResponse_count(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
 			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9465,14 +9430,14 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNItem2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterItem(ctx context.Context, sel ast.SelectionSet, v *model.MasterItem) graphql.Marshaler {
+func (ec *executionContext) marshalNItemResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐItemResponse(ctx context.Context, sel ast.SelectionSet, v *model.ItemResponse) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._Item(ctx, sel, v)
+	return ec._ItemResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNMeal2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMeal(ctx context.Context, sel ast.SelectionSet, v *model.Meal) graphql.Marshaler {
@@ -9943,7 +9908,7 @@ func (ec *executionContext) marshalOInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalOItem2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.MasterItem) graphql.Marshaler {
+func (ec *executionContext) marshalOItemResponse2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐItemResponseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ItemResponse) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -9970,7 +9935,7 @@ func (ec *executionContext) marshalOItem2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNItem2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterItem(ctx, sel, v[i])
+			ret[i] = ec.marshalNItemResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐItemResponse(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
