@@ -128,6 +128,7 @@ type ComplexityRoot struct {
 
 	Profile struct {
 		Age                     func(childComplexity int) int
+		Favorability            func(childComplexity int) int
 		Gender                  func(childComplexity int) int
 		Height                  func(childComplexity int) int
 		Id                      func(childComplexity int) int
@@ -612,6 +613,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Profile.Age(childComplexity), true
+
+	case "Profile.favorability":
+		if e.complexity.Profile.Favorability == nil {
+			break
+		}
+
+		return e.complexity.Profile.Favorability(childComplexity), true
 
 	case "Profile.gender":
 		if e.complexity.Profile.Gender == nil {
@@ -3965,6 +3973,47 @@ func (ec *executionContext) fieldContext_Profile_isCreated(_ context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _Profile_favorability(ctx context.Context, field graphql.CollectedField, obj *model.Profile) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Profile_favorability(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Favorability, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Profile_favorability(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Profile",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_user(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_user(ctx, field)
 	if err != nil {
@@ -4512,6 +4561,8 @@ func (ec *executionContext) fieldContext_User_profile(_ context.Context, field g
 				return ec.fieldContext_Profile_targetDailyCarorie(ctx, field)
 			case "isCreated":
 				return ec.fieldContext_Profile_isCreated(ctx, field)
+			case "favorability":
+				return ec.fieldContext_Profile_favorability(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Profile", field.Name)
 		},
@@ -8135,6 +8186,8 @@ func (ec *executionContext) _Profile(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "favorability":
+			out.Values[i] = ec._Profile_favorability(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9876,6 +9929,18 @@ func (ec *executionContext) unmarshalOInputFields2ᚕᚖgithubᚗcomᚋmoXXcha�
 		}
 	}
 	return res, nil
+}
+
+func (ec *executionContext) unmarshalOInt2int(ctx context.Context, v any) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	_ = sel
+	_ = ctx
+	res := graphql.MarshalInt(v)
+	return res
 }
 
 func (ec *executionContext) marshalOItem2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.MasterItem) graphql.Marshaler {
