@@ -184,10 +184,7 @@ models:
       isHaving:
         resolver: true
   Item:
-    model: github.com/moXXcha/hiroyuki_diet_API/graph/model.MasterItem
-    fields:
-      count:
-        resolver: true
+    model: github.com/moXXcha/hiroyuki_diet_API/graph/model.UserItem
 
     # The GraphQL spec explicitly states that the Int type is a signed 32-bit
     # integer. Using Go int or int64 to represent it can lead to unexpected
