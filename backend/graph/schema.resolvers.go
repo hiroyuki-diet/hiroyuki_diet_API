@@ -16,11 +16,6 @@ func (r *achievementResolver) IsClear(ctx context.Context, obj *model.MasterAchi
 	panic(fmt.Errorf("not implemented: IsClear - isClear"))
 }
 
-// EstimateCalorie is the resolver for the estimateCalorie field.
-func (r *foodResolver) EstimateCalorie(ctx context.Context, obj *model.Food) (int, error) {
-	panic(fmt.Errorf("not implemented: EstimateCalorie - estimateCalorie"))
-}
-
 // LastUsedDate is the resolver for the lastUsedDate field.
 func (r *foodResolver) LastUsedDate(ctx context.Context, obj *model.Food) (string, error) {
 	date := obj.LastUsedDate.Format("2006-01-02")
@@ -195,13 +190,7 @@ type userResolver struct{ *Resolver }
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
 /*
-	func (r *queryResolver) Items(ctx context.Context) ([]*model.MasterItem, error) {
-	panic(fmt.Errorf("not implemented: Items - items"))
-}
-func (r *queryResolver) HiroyukiSkins(ctx context.Context) ([]*model.MasterHiroyukiSkin, error) {
-	panic(fmt.Errorf("not implemented: HiroyukiSkins - hiroyukiSkins"))
-}
-func (r *queryResolver) Achievements(ctx context.Context) ([]*model.MasterAchievement, error) {
-	panic(fmt.Errorf("not implemented: Achievements - achievements"))
+	func (r *foodResolver) EstimateCalorie(ctx context.Context, obj *model.Food) (int, error) {
+	panic(fmt.Errorf("not implemented: EstimateCalorie - estimateCalorie"))
 }
 */
