@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -47,12 +48,20 @@ func (*Meal) Seeder(db *gorm.DB) error {
 
 	var food []Food
 	err := db.First(&food).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) || len(food) == 0 {
+		return fmt.Errorf("food not found")
+	}
 	if err != nil {
 		return err
 	}
 
 	var user User
 	err = db.First(&user).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("user not found")
+	}
 	if err != nil {
 		return err
 	}

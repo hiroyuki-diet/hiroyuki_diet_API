@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -48,6 +49,10 @@ func (*User) Seeder(db *gorm.DB) error {
 
 	var signUpToken SignUpToken
 	err := db.First(&signUpToken).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("signupToken not found")
+	}
 
 	if err != nil {
 		return err

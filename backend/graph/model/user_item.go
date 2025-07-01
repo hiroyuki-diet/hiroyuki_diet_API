@@ -1,6 +1,8 @@
 package model
 
 import (
+	"errors"
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -30,12 +32,24 @@ func (*UserItem) Seeder(db *gorm.DB) error {
 	var user User
 	err := db.First(&user).Error
 
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("user not found")
+	}
+
 	if err != nil {
 		return err
 	}
 
 	var item MasterItem
 	err = db.First(&item).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("item not found")
+	}
+
+	if err != nil {
+		return err
+	}
 
 	userItem := UserItem{UserId: user.Id, ItemId: item.Id, Count: 1}
 

@@ -1,6 +1,8 @@
 package model
 
 import (
+	"errors"
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -28,15 +30,22 @@ func (*UserSkin) Seeder(db *gorm.DB) error {
 		return nil
 	}
 
-	var user User
+	var user *User
 	err := db.First(&user).Error
 
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("user not found")
+	}
 	if err != nil {
 		return err
 	}
 
 	var skin MasterHiroyukiSkin
 	err = db.First(&skin).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("skin not found")
+	}
 
 	if err != nil {
 		return err

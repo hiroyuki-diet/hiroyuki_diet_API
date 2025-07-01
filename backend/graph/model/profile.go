@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -55,6 +56,10 @@ func (*Profile) Seeder(db *gorm.DB) error {
 	var user User
 
 	err := db.First(&user).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("user not found")
+	}
 
 	if err != nil {
 		return err
