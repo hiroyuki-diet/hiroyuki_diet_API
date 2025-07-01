@@ -17,3 +17,33 @@ type UserItem struct {
 	UpdatedAt time.Time      `gorm:"type: timestamp; autoUpdateTime;<-:update"`
 	DeletedAt gorm.DeletedAt `gorm:"type: timestamp; index"`
 }
+
+func (*UserItem) Seeder(db *gorm.DB) error {
+	var count int64
+
+	// main.goが実行される度にレコードが生成されないようにする。
+	db.Model(&UserItem{}).Count(&count)
+	if count > 0 {
+		return nil
+	}
+
+	var user User
+	err := db.First(&user).Error
+
+	if err != nil {
+		return err
+	}
+
+	var item MasterItem
+	err = db.First(&item).Error
+
+	userItem := UserItem{UserId: user.Id, ItemId: item.Id, Count: 1}
+
+	err = db.Create(&userItem).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -18,3 +18,37 @@ type UserSkin struct {
 	UpdatedAt time.Time          `gorm:"type: timestamp; autoUpdateTime;<-:update"`
 	DeletedAt gorm.DeletedAt     `gorm:"type: timestamp; index"`
 }
+
+func (*UserSkin) Seeder(db *gorm.DB) error {
+	var count int64
+
+	// main.goが実行される度にレコードが生成されないようにする。
+	db.Model(&UserSkin{}).Count(&count)
+	if count > 0 {
+		return nil
+	}
+
+	var user User
+	err := db.First(&user).Error
+
+	if err != nil {
+		return err
+	}
+
+	var skin MasterHiroyukiSkin
+	err = db.First(&skin).Error
+
+	if err != nil {
+		return err
+	}
+
+	userSkin := UserSkin{UserId: user.Id, SkinId: skin.Id, IsUsing: true, IsHaving: true}
+
+	err = db.Create(&userSkin).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

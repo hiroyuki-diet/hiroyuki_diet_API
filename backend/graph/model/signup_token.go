@@ -14,3 +14,23 @@ type SignUpToken struct {
 	UpdatedAt   time.Time      `gorm:"type: timestamp; autoUpdateTime;<-:update"`
 	DeletedAt   gorm.DeletedAt `gorm:"type: timestamp; index"`
 }
+
+func (*SignUpToken) Seeder(db *gorm.DB) error {
+	var count int64
+
+	// main.goが実行される度にレコードが生成されないようにする。
+	db.Model(&SignUpToken{}).Count(&count)
+	if count > 0 {
+		return nil
+	}
+
+	signUpToken := SignUpToken{Token: 123456, SurviveTime: 1}
+
+	err := db.Create(&signUpToken).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
