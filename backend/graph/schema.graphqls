@@ -35,7 +35,7 @@ enum GenderEnum {
   WOMAN
 }
 type Query {
-  user(id: ID!, usingSkin: Boolean, voiceField: [InputFields!]): User!
+  user(id: ID!): User!
   foods: [Food!]!
 }
 
@@ -106,12 +106,12 @@ type User {
   signUpToken: SignUpToken!
   isTokenAuthenticated: Boolean!
   experiencePoInt: Int!
-  exercisies: [Exercise!]
+  exercisies(offset: String!, limit: String!): [Exercise!]
   meals: [Meal!]
   items: [ItemResponse!]
-  hiroyukiSkins: [HiroyukiSkin!]!
+  hiroyukiSkins(usingSkin: Boolean!): [HiroyukiSkin!]!
   achievements: [Achievement!]!
-  hiroyukiVoicies: [HiroyukiVoice!]!
+  hiroyukiVoicies(fields: [InputFields!]!): [HiroyukiVoice!]!
 }
 
 type HiroyukiVoice {
@@ -167,6 +167,7 @@ type SignUpToken {
 type Exercise {
   id: ID!
   time: Int!
+  date: String!
 }
 
 type Profile {
