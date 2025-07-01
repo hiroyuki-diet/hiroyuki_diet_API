@@ -38,7 +38,8 @@ func main() {
 	hiroyukiVoice := model.MasterHiroyukiVoice{}
 	item := model.MasterItem{}
 
-	err := achievement.FirstCreate(db)
+	var err error
+	err = achievement.FirstCreate(db)
 
 	if err != nil {
 		log.Fatal(err)

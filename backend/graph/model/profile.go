@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -41,4 +42,36 @@ func (*Profile) GetInfo(id UUID, db *gorm.DB) (*Profile, error) {
 	}
 
 	return profile, nil
+}
+
+func (*Profile) Seeder(db *gorm.DB) error {
+	var count int64
+
+	// main.goが実行される度にレコードが生成されないようにする。
+	db.Model(&Profile{}).Count(&count)
+	if count > 0 {
+		return nil
+	}
+
+	var user User
+
+	err := db.First(&user).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("user not found")
+	}
+
+	if err != nil {
+		return err
+	}
+
+	profile := Profile{UserId: user.Id, UserName: "こなみるく", Age: 30, Gender: "woman", Weight: 30, Height: 165, TargetWeight: 20, TargetDailyExerciseTime: 1, TargetDailyCarorie: 1000, Favorability: 1, IsCreated: true}
+
+	err = db.Create(&profile).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

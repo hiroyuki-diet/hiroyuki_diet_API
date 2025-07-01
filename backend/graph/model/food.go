@@ -32,3 +32,28 @@ func (*Food) GetAll(db *gorm.DB) ([]*Food, error) {
 
 	return foods, nil
 }
+
+func (*Food) Seeder(db *gorm.DB) error {
+	var count int64
+
+	// main.goが実行される度にレコードが生成されないようにする。
+	db.Model(&Food{}).Count(&count)
+	if count > 0 {
+		return nil
+	}
+
+	t, err := time.Parse("2006-01-02", "2025-07-01")
+
+	if err != nil {
+		return err
+	}
+
+	food := Food{Name: "たこやき", EstimateCalorie: 1000, LastUsedDate: t}
+	err = db.Create(&food).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

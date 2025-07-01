@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -35,4 +36,35 @@ func (*User) GetInfo(id UUID, db *gorm.DB) (*User, error) {
 	}
 
 	return user, nil
+}
+
+func (*User) Seeder(db *gorm.DB) error {
+	var count int64
+
+	// main.goが実行される度にレコードが生成されないようにする。
+	db.Model(&User{}).Count(&count)
+	if count > 0 {
+		return nil
+	}
+
+	var signUpToken SignUpToken
+	err := db.First(&signUpToken).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("signupToken not found")
+	}
+
+	if err != nil {
+		return err
+	}
+
+	user := User{Email: "konami@example.com", Password: "test", Level: 1, SignUpTokenId: signUpToken.Id, IsTokenAuthenticated: true, ExperiencePoint: 50}
+
+	err = db.Create(&user).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
