@@ -32,11 +32,6 @@ func (r *hiroyukiSkinResolver) IsHaving(ctx context.Context, obj *model.MasterHi
 	panic(fmt.Errorf("not implemented: IsHaving - isHaving"))
 }
 
-// TotalCalorie is the resolver for the totalCalorie field.
-func (r *mealResolver) TotalCalorie(ctx context.Context, obj *model.Meal) (int, error) {
-	panic(fmt.Errorf("not implemented: TotalCalorie - totalCalorie"))
-}
-
 // SignUp is the resolver for the signUp field.
 func (r *mutationResolver) SignUp(ctx context.Context, input model.Auth) (string, error) {
 	panic(fmt.Errorf("not implemented: SignUp - signUp"))
@@ -128,7 +123,10 @@ func (r *userResolver) Exercisies(ctx context.Context, obj *model.User) ([]*mode
 
 // Meals is the resolver for the meals field.
 func (r *userResolver) Meals(ctx context.Context, obj *model.User) ([]*model.Meal, error) {
-	panic(fmt.Errorf("not implemented: Meals - meals"))
+	db := r.DB
+	mealModel := model.Meal{}
+	meals, err := mealModel.GetAll(obj.Id, db)
+	return meals, err
 }
 
 // Items is the resolver for the items field.
@@ -163,9 +161,6 @@ func (r *Resolver) Food() FoodResolver { return &foodResolver{r} }
 // HiroyukiSkin returns HiroyukiSkinResolver implementation.
 func (r *Resolver) HiroyukiSkin() HiroyukiSkinResolver { return &hiroyukiSkinResolver{r} }
 
-// Meal returns MealResolver implementation.
-func (r *Resolver) Meal() MealResolver { return &mealResolver{r} }
-
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
@@ -178,7 +173,6 @@ func (r *Resolver) User() UserResolver { return &userResolver{r} }
 type achievementResolver struct{ *Resolver }
 type foodResolver struct{ *Resolver }
 type hiroyukiSkinResolver struct{ *Resolver }
-type mealResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
@@ -190,15 +184,9 @@ type userResolver struct{ *Resolver }
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
 /*
-	func (r *itemResolver) Name(ctx context.Context, obj *model.UserItem) (string, error) {
-	panic(fmt.Errorf("not implemented: Name - name"))
+	func (r *mealResolver) TotalCalorie(ctx context.Context, obj *model.Meal) (int, error) {
+	panic(fmt.Errorf("not implemented: TotalCalorie - totalCalorie"))
 }
-func (r *itemResolver) Description(ctx context.Context, obj *model.UserItem) (string, error) {
-	panic(fmt.Errorf("not implemented: Description - description"))
-}
-func (r *itemResolver) ItemImage(ctx context.Context, obj *model.UserItem) (string, error) {
-	panic(fmt.Errorf("not implemented: ItemImage - itemImage"))
-}
-func (r *Resolver) Item() ItemResolver { return &itemResolver{r} }
-type itemResolver struct{ *Resolver }
+func (r *Resolver) Meal() MealResolver { return &mealResolver{r} }
+type mealResolver struct{ *Resolver }
 */

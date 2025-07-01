@@ -43,7 +43,6 @@ type ResolverRoot interface {
 	Achievement() AchievementResolver
 	Food() FoodResolver
 	HiroyukiSkin() HiroyukiSkinResolver
-	Meal() MealResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 	User() UserResolver
@@ -176,9 +175,6 @@ type FoodResolver interface {
 type HiroyukiSkinResolver interface {
 	IsUsing(ctx context.Context, obj *model.MasterHiroyukiSkin) (bool, error)
 	IsHaving(ctx context.Context, obj *model.MasterHiroyukiSkin) (bool, error)
-}
-type MealResolver interface {
-	TotalCalorie(ctx context.Context, obj *model.Meal) (int, error)
 }
 type MutationResolver interface {
 	SignUp(ctx context.Context, input model.Auth) (string, error)
@@ -2785,7 +2781,7 @@ func (ec *executionContext) _Meal_totalCalorie(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Meal().TotalCalorie(rctx, obj)
+		return obj.TotalCalorie, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2806,8 +2802,8 @@ func (ec *executionContext) fieldContext_Meal_totalCalorie(_ context.Context, fi
 	fc = &graphql.FieldContext{
 		Object:     "Meal",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
@@ -7893,53 +7889,22 @@ func (ec *executionContext) _Meal(ctx context.Context, sel ast.SelectionSet, obj
 		case "id":
 			out.Values[i] = ec._Meal_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "mealType":
 			out.Values[i] = ec._Meal_mealType(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "totalCalorie":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Meal_totalCalorie(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
+			out.Values[i] = ec._Meal_totalCalorie(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
 			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "foods":
 			out.Values[i] = ec._Meal_foods(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
