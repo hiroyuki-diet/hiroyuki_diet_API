@@ -35,3 +35,34 @@ func (*Meal) GetAll(id UUID, db *gorm.DB) ([]*Meal, error) {
 
 	return meals, nil
 }
+
+func (*Meal) Seeder(db *gorm.DB) error {
+	var count int64
+
+	// main.goが実行される度にレコードが生成されないようにする。
+	db.Model(&Meal{}).Count(&count)
+	if count > 0 {
+		return nil
+	}
+
+	var food []Food
+	err := db.First(&food).Error
+	if err != nil {
+		return err
+	}
+
+	var user User
+	err = db.First(&user).Error
+	if err != nil {
+		return err
+	}
+
+	meal := Meal{UserId: user.Id, MealType: "breakfast", TotalCalorie: 1000, Foods: food}
+	err = db.Create(&meal).Error
+
+	if err != err {
+		return err
+	}
+
+	return nil
+}
