@@ -37,6 +37,22 @@ func (*Meal) GetAll(id UUID, db *gorm.DB) ([]*Meal, error) {
 	return meals, nil
 }
 
+func (*Meal) GetById(id UUID, db *gorm.DB) (*Meal, error) {
+	var meal *Meal
+
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	err := db.Preload("Foods").Where("id =?", id).First(&meal).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return meal, nil
+}
+
 func (*Meal) Seeder(db *gorm.DB) error {
 	var count int64
 
