@@ -63,11 +63,6 @@ type ComplexityRoot struct {
 		Time func(childComplexity int) int
 	}
 
-	Field struct {
-		Field func(childComplexity int) int
-		Id    func(childComplexity int) int
-	}
-
 	Food struct {
 		EstimateCalorie func(childComplexity int) int
 		Id              func(childComplexity int) int
@@ -79,6 +74,7 @@ type ComplexityRoot struct {
 		Fields       func(childComplexity int) int
 		Id           func(childComplexity int) int
 		IsHaving     func(childComplexity int) int
+		Name         func(childComplexity int) int
 		ReleaseLevel func(childComplexity int) int
 		VoiceUrl     func(childComplexity int) int
 	}
@@ -155,7 +151,7 @@ type ComplexityRoot struct {
 		Exercisies           func(childComplexity int, offset string, limit string) int
 		ExperiencePoint      func(childComplexity int) int
 		HiroyukiSkins        func(childComplexity int, usingSkin bool) int
-		HiroyukiVoicies      func(childComplexity int, fields model.InputFields) int
+		HiroyukiVoicies      func(childComplexity int, fields []utils.Field) int
 		Id                   func(childComplexity int) int
 		IsTokenAuthenticated func(childComplexity int) int
 		Items                func(childComplexity int) int
@@ -200,7 +196,7 @@ type UserResolver interface {
 	Items(ctx context.Context, obj *model.User) ([]*model.ItemResponse, error)
 	HiroyukiSkins(ctx context.Context, obj *model.User, usingSkin bool) ([]*model.SkinResponse, error)
 	Achievements(ctx context.Context, obj *model.User) ([]*model.AchievementResponse, error)
-	HiroyukiVoicies(ctx context.Context, obj *model.User, fields model.InputFields) ([]*model.HiroyukiVoiceResponse, error)
+	HiroyukiVoicies(ctx context.Context, obj *model.User, fields []utils.Field) ([]*model.HiroyukiVoiceResponse, error)
 }
 
 type executableSchema struct {
@@ -264,20 +260,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Exercise.Time(childComplexity), true
 
-	case "Field.field":
-		if e.complexity.Field.Field == nil {
-			break
-		}
-
-		return e.complexity.Field.Field(childComplexity), true
-
-	case "Field.id":
-		if e.complexity.Field.Id == nil {
-			break
-		}
-
-		return e.complexity.Field.Id(childComplexity), true
-
 	case "Food.estimateCalorie":
 		if e.complexity.Food.EstimateCalorie == nil {
 			break
@@ -326,6 +308,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.HiroyukiVoiceResponse.IsHaving(childComplexity), true
+
+	case "HiroyukiVoiceResponse.Name":
+		if e.complexity.HiroyukiVoiceResponse.Name == nil {
+			break
+		}
+
+		return e.complexity.HiroyukiVoiceResponse.Name(childComplexity), true
 
 	case "HiroyukiVoiceResponse.releaseLevel":
 		if e.complexity.HiroyukiVoiceResponse.ReleaseLevel == nil {
@@ -776,7 +765,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.User.HiroyukiVoicies(childComplexity, args["fields"].(model.InputFields)), true
+		return e.complexity.User.HiroyukiVoicies(childComplexity, args["fields"].([]utils.Field)), true
 
 	case "User.id":
 		if e.complexity.User.Id == nil {
@@ -1370,13 +1359,13 @@ func (ec *executionContext) field_User_hiroyukiVoicies_args(ctx context.Context,
 func (ec *executionContext) field_User_hiroyukiVoicies_argsFields(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (model.InputFields, error) {
+) ([]utils.Field, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("fields"))
 	if tmp, ok := rawArgs["fields"]; ok {
-		return ec.unmarshalNInputFields2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFields(ctx, tmp)
+		return ec.unmarshalNFieldEnum2ᚕgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋutilsᚐFieldᚄ(ctx, tmp)
 	}
 
-	var zeroVal model.InputFields
+	var zeroVal []utils.Field
 	return zeroVal, nil
 }
 
@@ -1767,94 +1756,6 @@ func (ec *executionContext) fieldContext_Exercise_date(_ context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Field_id(ctx context.Context, field graphql.CollectedField, obj *model.MasterField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Field_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Id, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(model.UUID)
-	fc.Result = res
-	return ec.marshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Field_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Field",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Field_field(ctx context.Context, field graphql.CollectedField, obj *model.MasterField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Field_field(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Field, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(utils.Field)
-	fc.Result = res
-	return ec.marshalNFieldEnum2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋutilsᚐField(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Field_field(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Field",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type FieldEnum does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Food_id(ctx context.Context, field graphql.CollectedField, obj *model.Food) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Food_id(ctx, field)
 	if err != nil {
@@ -2075,6 +1976,50 @@ func (ec *executionContext) fieldContext_HiroyukiVoiceResponse_id(_ context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _HiroyukiVoiceResponse_Name(ctx context.Context, field graphql.CollectedField, obj *model.HiroyukiVoiceResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_HiroyukiVoiceResponse_Name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_HiroyukiVoiceResponse_Name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "HiroyukiVoiceResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _HiroyukiVoiceResponse_voiceUrl(ctx context.Context, field graphql.CollectedField, obj *model.HiroyukiVoiceResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_HiroyukiVoiceResponse_voiceUrl(ctx, field)
 	if err != nil {
@@ -2189,9 +2134,9 @@ func (ec *executionContext) _HiroyukiVoiceResponse_fields(ctx context.Context, f
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]model.MasterField)
+	res := resTmp.([]utils.Field)
 	fc.Result = res
-	return ec.marshalNField2ᚕgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterFieldᚄ(ctx, field.Selections, res)
+	return ec.marshalNFieldEnum2ᚕgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋutilsᚐFieldᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_HiroyukiVoiceResponse_fields(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2201,13 +2146,7 @@ func (ec *executionContext) fieldContext_HiroyukiVoiceResponse_fields(_ context.
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Field_id(ctx, field)
-			case "field":
-				return ec.fieldContext_Field_field(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Field", field.Name)
+			return nil, errors.New("field of type FieldEnum does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5266,7 +5205,7 @@ func (ec *executionContext) _User_hiroyukiVoicies(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().HiroyukiVoicies(rctx, obj, fc.Args["fields"].(model.InputFields))
+		return ec.resolvers.User().HiroyukiVoicies(rctx, obj, fc.Args["fields"].([]utils.Field))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5293,6 +5232,8 @@ func (ec *executionContext) fieldContext_User_hiroyukiVoicies(ctx context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_HiroyukiVoiceResponse_id(ctx, field)
+			case "Name":
+				return ec.fieldContext_HiroyukiVoiceResponse_Name(ctx, field)
 			case "voiceUrl":
 				return ec.fieldContext_HiroyukiVoiceResponse_voiceUrl(ctx, field)
 			case "releaseLevel":
@@ -7749,50 +7690,6 @@ func (ec *executionContext) _Exercise(ctx context.Context, sel ast.SelectionSet,
 	return out
 }
 
-var fieldImplementors = []string{"Field"}
-
-func (ec *executionContext) _Field(ctx context.Context, sel ast.SelectionSet, obj *model.MasterField) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, fieldImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Field")
-		case "id":
-			out.Values[i] = ec._Field_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "field":
-			out.Values[i] = ec._Field_field(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
 var foodImplementors = []string{"Food"}
 
 func (ec *executionContext) _Food(ctx context.Context, sel ast.SelectionSet, obj *model.Food) graphql.Marshaler {
@@ -7891,6 +7788,11 @@ func (ec *executionContext) _HiroyukiVoiceResponse(ctx context.Context, sel ast.
 			out.Values[i] = graphql.MarshalString("HiroyukiVoiceResponse")
 		case "id":
 			out.Values[i] = ec._HiroyukiVoiceResponse_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "Name":
+			out.Values[i] = ec._HiroyukiVoiceResponse_Name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -9242,11 +9144,39 @@ func (ec *executionContext) marshalNExercise2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuk
 	return ec._Exercise(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNField2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterField(ctx context.Context, sel ast.SelectionSet, v model.MasterField) graphql.Marshaler {
-	return ec._Field(ctx, sel, &v)
+func (ec *executionContext) unmarshalNFieldEnum2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋutilsᚐField(ctx context.Context, v any) (utils.Field, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := utils.Field(tmp)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNField2ᚕgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterFieldᚄ(ctx context.Context, sel ast.SelectionSet, v []model.MasterField) graphql.Marshaler {
+func (ec *executionContext) marshalNFieldEnum2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋutilsᚐField(ctx context.Context, sel ast.SelectionSet, v utils.Field) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNFieldEnum2ᚕgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋutilsᚐFieldᚄ(ctx context.Context, v any) ([]utils.Field, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]utils.Field, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNFieldEnum2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋutilsᚐField(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNFieldEnum2ᚕgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋutilsᚐFieldᚄ(ctx context.Context, sel ast.SelectionSet, v []utils.Field) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -9270,7 +9200,7 @@ func (ec *executionContext) marshalNField2ᚕgithubᚗcomᚋmoXXchaᚋhiroyuki_d
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNField2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterField(ctx, sel, v[i])
+			ret[i] = ec.marshalNFieldEnum2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋutilsᚐField(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -9288,23 +9218,6 @@ func (ec *executionContext) marshalNField2ᚕgithubᚗcomᚋmoXXchaᚋhiroyuki_d
 	}
 
 	return ret
-}
-
-func (ec *executionContext) unmarshalNFieldEnum2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋutilsᚐField(ctx context.Context, v any) (utils.Field, error) {
-	tmp, err := graphql.UnmarshalString(v)
-	res := utils.Field(tmp)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNFieldEnum2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋutilsᚐField(ctx context.Context, sel ast.SelectionSet, v utils.Field) graphql.Marshaler {
-	_ = sel
-	res := graphql.MarshalString(string(v))
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
 }
 
 func (ec *executionContext) unmarshalNFieldInput2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐFieldInputᚄ(ctx context.Context, v any) ([]*model.FieldInput, error) {
@@ -9512,11 +9425,6 @@ func (ec *executionContext) marshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_AP
 
 func (ec *executionContext) unmarshalNInputExercise2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputExercise(ctx context.Context, v any) (model.InputExercise, error) {
 	res, err := ec.unmarshalInputInputExercise(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNInputFields2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFields(ctx context.Context, v any) (model.InputFields, error) {
-	res, err := ec.unmarshalInputInputFields(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

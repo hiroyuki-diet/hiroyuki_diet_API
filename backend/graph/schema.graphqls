@@ -112,21 +112,17 @@ type User {
   items: [ItemResponse!]
   hiroyukiSkins(usingSkin: Boolean!): [SkinResponse!]!
   achievements: [AchievementResponse!]!
-  hiroyukiVoicies(fields: InputFields!): [HiroyukiVoiceResponse!]!
+  hiroyukiVoicies(fields: [FieldEnum!]!): [HiroyukiVoiceResponse!]!
 }
 
 type HiroyukiVoiceResponse {
   id: ID!
+  Name: String!
   voiceUrl: String!
   releaseLevel: Int!
-  fields: [Field!]!
+  fields: [FieldEnum!]!
   isHaving: Boolean!
 }
-type Field {
-  id: ID!
-  field: FieldEnum!
-}
-
 type AchievementResponse {
   id: ID!
   name: String!

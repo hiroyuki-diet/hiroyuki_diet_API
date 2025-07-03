@@ -29,8 +29,9 @@ type AchievementResponse struct {
 
 type HiroyukiVoiceResponse struct {
 	Id           UUID
+	Name         string
 	VoiceUrl     string
 	ReleaseLevel int
-	Fields       []MasterField
+	Fields       []utils.Field
 	IsHaving     bool
 }
