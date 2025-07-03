@@ -15,7 +15,6 @@ type UserSkin struct {
 	SkinId    UUID               `gorm:"type: uuid; not null"`
 	Skin      MasterHiroyukiSkin `gorm:"foreignKey:SkinId;references:Id"`
 	IsUsing   bool               `gorm:"type: bool; not null; default: false"`
-	IsHaving  bool               `gorm:"type: bool; not null; default: false"`
 	CreatedAt time.Time          `gorm:"type: timestamp; autoCreateTime; not null; default:CURRENT_TIMESTAMP;<-:create"`
 	UpdatedAt time.Time          `gorm:"type: timestamp; autoUpdateTime;<-:update"`
 	DeletedAt gorm.DeletedAt     `gorm:"type: timestamp; index"`
@@ -51,7 +50,7 @@ func (*UserSkin) Seeder(db *gorm.DB) error {
 		return err
 	}
 
-	userSkin := UserSkin{UserId: user.Id, SkinId: skin.Id, IsUsing: true, IsHaving: true}
+	userSkin := UserSkin{UserId: user.Id, SkinId: skin.Id, IsUsing: true}
 
 	err = db.Create(&userSkin).Error
 
