@@ -18,7 +18,7 @@ func (r *achievementResolver) IsClear(ctx context.Context, obj *model.MasterAchi
 
 // Date is the resolver for the date field.
 func (r *exerciseResolver) Date(ctx context.Context, obj *model.Exercise) (string, error) {
-	panic(fmt.Errorf("not implemented: Date - date"))
+	return obj.Date.Format("2006-01-02"), nil
 }
 
 // LastUsedDate is the resolver for the lastUsedDate field.
