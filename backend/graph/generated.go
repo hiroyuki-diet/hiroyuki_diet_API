@@ -40,7 +40,6 @@ type Config struct {
 }
 
 type ResolverRoot interface {
-	Achievement() AchievementResolver
 	Exercise() ExerciseResolver
 	Food() FoodResolver
 	Mutation() MutationResolver
@@ -52,7 +51,7 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	Achievement struct {
+	AchievementResponse struct {
 		Id      func(childComplexity int) int
 		IsClear func(childComplexity int) int
 		Name    func(childComplexity int) int
@@ -168,9 +167,6 @@ type ComplexityRoot struct {
 	}
 }
 
-type AchievementResolver interface {
-	IsClear(ctx context.Context, obj *model.MasterAchievement) (bool, error)
-}
 type ExerciseResolver interface {
 	Date(ctx context.Context, obj *model.Exercise) (string, error)
 }
@@ -203,7 +199,7 @@ type UserResolver interface {
 	Meal(ctx context.Context, obj *model.User, id model.UUID) (*model.Meal, error)
 	Items(ctx context.Context, obj *model.User) ([]*model.ItemResponse, error)
 	HiroyukiSkins(ctx context.Context, obj *model.User, usingSkin bool) ([]*model.SkinResponse, error)
-	Achievements(ctx context.Context, obj *model.User) ([]*model.MasterAchievement, error)
+	Achievements(ctx context.Context, obj *model.User) ([]*model.AchievementResponse, error)
 	HiroyukiVoicies(ctx context.Context, obj *model.User, fields []*model.InputFields) ([]*model.HiroyukiVoice, error)
 }
 
@@ -226,26 +222,26 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Achievement.id":
-		if e.complexity.Achievement.Id == nil {
+	case "AchievementResponse.id":
+		if e.complexity.AchievementResponse.Id == nil {
 			break
 		}
 
-		return e.complexity.Achievement.Id(childComplexity), true
+		return e.complexity.AchievementResponse.Id(childComplexity), true
 
-	case "Achievement.isClear":
-		if e.complexity.Achievement.IsClear == nil {
+	case "AchievementResponse.isClear":
+		if e.complexity.AchievementResponse.IsClear == nil {
 			break
 		}
 
-		return e.complexity.Achievement.IsClear(childComplexity), true
+		return e.complexity.AchievementResponse.IsClear(childComplexity), true
 
-	case "Achievement.name":
-		if e.complexity.Achievement.Name == nil {
+	case "AchievementResponse.name":
+		if e.complexity.AchievementResponse.Name == nil {
 			break
 		}
 
-		return e.complexity.Achievement.Name(childComplexity), true
+		return e.complexity.AchievementResponse.Name(childComplexity), true
 
 	case "Exercise.date":
 		if e.complexity.Exercise.Date == nil {
@@ -1507,8 +1503,8 @@ func (ec *executionContext) field___Type_fields_argsIncludeDeprecated(
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Achievement_id(ctx context.Context, field graphql.CollectedField, obj *model.MasterAchievement) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Achievement_id(ctx, field)
+func (ec *executionContext) _AchievementResponse_id(ctx context.Context, field graphql.CollectedField, obj *model.AchievementResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AchievementResponse_id(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1538,9 +1534,9 @@ func (ec *executionContext) _Achievement_id(ctx context.Context, field graphql.C
 	return ec.marshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Achievement_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_AchievementResponse_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Achievement",
+		Object:     "AchievementResponse",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1551,8 +1547,8 @@ func (ec *executionContext) fieldContext_Achievement_id(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Achievement_name(ctx context.Context, field graphql.CollectedField, obj *model.MasterAchievement) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Achievement_name(ctx, field)
+func (ec *executionContext) _AchievementResponse_name(ctx context.Context, field graphql.CollectedField, obj *model.AchievementResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AchievementResponse_name(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1582,9 +1578,9 @@ func (ec *executionContext) _Achievement_name(ctx context.Context, field graphql
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Achievement_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_AchievementResponse_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Achievement",
+		Object:     "AchievementResponse",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1595,8 +1591,8 @@ func (ec *executionContext) fieldContext_Achievement_name(_ context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Achievement_isClear(ctx context.Context, field graphql.CollectedField, obj *model.MasterAchievement) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Achievement_isClear(ctx, field)
+func (ec *executionContext) _AchievementResponse_isClear(ctx context.Context, field graphql.CollectedField, obj *model.AchievementResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AchievementResponse_isClear(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1609,7 +1605,7 @@ func (ec *executionContext) _Achievement_isClear(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Achievement().IsClear(rctx, obj)
+		return obj.IsClear, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1626,12 +1622,12 @@ func (ec *executionContext) _Achievement_isClear(ctx context.Context, field grap
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Achievement_isClear(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_AchievementResponse_isClear(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Achievement",
+		Object:     "AchievementResponse",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
 		},
@@ -5230,9 +5226,9 @@ func (ec *executionContext) _User_achievements(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.MasterAchievement)
+	res := resTmp.([]*model.AchievementResponse)
 	fc.Result = res
-	return ec.marshalNAchievement2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterAchievementᚄ(ctx, field.Selections, res)
+	return ec.marshalNAchievementResponse2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐAchievementResponseᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_achievements(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5244,13 +5240,13 @@ func (ec *executionContext) fieldContext_User_achievements(_ context.Context, fi
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Achievement_id(ctx, field)
+				return ec.fieldContext_AchievementResponse_id(ctx, field)
 			case "name":
-				return ec.fieldContext_Achievement_name(ctx, field)
+				return ec.fieldContext_AchievementResponse_name(ctx, field)
 			case "isClear":
-				return ec.fieldContext_Achievement_isClear(ctx, field)
+				return ec.fieldContext_AchievementResponse_isClear(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Achievement", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type AchievementResponse", field.Name)
 		},
 	}
 	return fc, nil
@@ -7624,63 +7620,32 @@ func (ec *executionContext) unmarshalInputUseItem(ctx context.Context, obj any) 
 
 // region    **************************** object.gotpl ****************************
 
-var achievementImplementors = []string{"Achievement"}
+var achievementResponseImplementors = []string{"AchievementResponse"}
 
-func (ec *executionContext) _Achievement(ctx context.Context, sel ast.SelectionSet, obj *model.MasterAchievement) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, achievementImplementors)
+func (ec *executionContext) _AchievementResponse(ctx context.Context, sel ast.SelectionSet, obj *model.AchievementResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, achievementResponseImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("Achievement")
+			out.Values[i] = graphql.MarshalString("AchievementResponse")
 		case "id":
-			out.Values[i] = ec._Achievement_id(ctx, field, obj)
+			out.Values[i] = ec._AchievementResponse_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "name":
-			out.Values[i] = ec._Achievement_name(ctx, field, obj)
+			out.Values[i] = ec._AchievementResponse_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "isClear":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Achievement_isClear(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
+			out.Values[i] = ec._AchievementResponse_isClear(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
 			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9192,7 +9157,7 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) marshalNAchievement2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterAchievementᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.MasterAchievement) graphql.Marshaler {
+func (ec *executionContext) marshalNAchievementResponse2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐAchievementResponseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.AchievementResponse) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -9216,7 +9181,7 @@ func (ec *executionContext) marshalNAchievement2ᚕᚖgithubᚗcomᚋmoXXchaᚋh
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNAchievement2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterAchievement(ctx, sel, v[i])
+			ret[i] = ec.marshalNAchievementResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐAchievementResponse(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -9236,14 +9201,14 @@ func (ec *executionContext) marshalNAchievement2ᚕᚖgithubᚗcomᚋmoXXchaᚋh
 	return ret
 }
 
-func (ec *executionContext) marshalNAchievement2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterAchievement(ctx context.Context, sel ast.SelectionSet, v *model.MasterAchievement) graphql.Marshaler {
+func (ec *executionContext) marshalNAchievementResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐAchievementResponse(ctx context.Context, sel ast.SelectionSet, v *model.AchievementResponse) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._Achievement(ctx, sel, v)
+	return ec._AchievementResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNAuth2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐAuth(ctx context.Context, v any) (model.Auth, error) {

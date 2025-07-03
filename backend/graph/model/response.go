@@ -20,3 +20,9 @@ type SkinResponse struct {
 	IsUsing      bool
 	IsHaving     bool
 }
+
+type AchievementResponse struct {
+	Id      UUID
+	Name    string
+	IsClear bool
+}
