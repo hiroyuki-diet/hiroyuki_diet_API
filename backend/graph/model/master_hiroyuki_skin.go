@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/moXXcha/hiroyuki_diet_API/utils"
@@ -17,6 +18,36 @@ type MasterHiroyukiSkin struct {
 	CreatedAt    time.Time      `gorm:"type: timestamp; autoCreateTime; not null; default:CURRENT_TIMESTAMP;<-:create"`
 	UpdatedAt    time.Time      `gorm:"type: timestamp; autoUpdateTime;<-:update"`
 	DeletedAt    gorm.DeletedAt `gorm:"type: timestamp; index"`
+}
+
+func (*MasterHiroyukiSkin) GetSkins(id UUID, isUsingSkin bool, db *gorm.DB) ([]*SkinResponse, error) {
+	var skins []*SkinResponse
+
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	query := db.
+		Table("master_hiroyuki_skins").
+		Select(`
+			master_hiroyuki_skins.id,
+			master_hiroyuki_skins.name,
+			master_hiroyuki_skins.description,
+			master_hiroyuki_skins.part,
+			master_hiroyuki_skins.release_level,
+			COALESCE(user_skins.is_using, false) AS is_using,
+			CASE WHEN user_skins.id IS NOT NULL THEN true ELSE false END AS is_having`).
+		Joins("LEFT JOIN user_skins ON master_hiroyuki_skins.id = user_skins.skin_id AND user_skins.user_id = ?", id)
+
+	if isUsingSkin {
+		query = query.Where("user_skins.is_using = ?", true)
+	}
+
+	err := query.Scan(&skins).Error
+	if err != nil {
+		return nil, err
+	}
+	return skins, nil
 }
 
 func (*MasterHiroyukiSkin) FirstCreate(db *gorm.DB) error {
