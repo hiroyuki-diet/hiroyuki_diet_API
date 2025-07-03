@@ -9,7 +9,7 @@ import (
 
 type MasterField struct {
 	Id        UUID           `gorm:"primary_key; type: uuid; not null; default:uuid_generate_v4()"`
-	Field     utils.Field    `gorm:"type: field; not null"`
+	Field     utils.Field    `gorm:"type: field; unique; not null"`
 	CreatedAt time.Time      `gorm:"type: timestamp; autoCreateTime; not null; default:CURRENT_TIMESTAMP;<-:create"`
 	UpdatedAt time.Time      `gorm:"type: timestamp; autoUpdateTime;<-:update"`
 	DeletedAt gorm.DeletedAt `gorm:"type: timestamp; index"`
@@ -62,10 +62,11 @@ func (*MasterField) FirstCreate(db *gorm.DB) error {
 	}
 
 	for i := range fields {
-		result := db.FirstOrCreate(&fields[i], MasterField{Field: fields[i].Field})
-		if result.Error != nil {
-			return result.Error
+		err := db.FirstOrCreate(&fields[i], "field = ?", fields[i].Field).Error
+		if err != nil {
+			return err
 		}
 	}
+
 	return nil
 }
