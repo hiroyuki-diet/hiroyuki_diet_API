@@ -149,7 +149,10 @@ func (r *userResolver) HiroyukiSkins(ctx context.Context, obj *model.User, using
 
 // Achievements is the resolver for the achievements field.
 func (r *userResolver) Achievements(ctx context.Context, obj *model.User) ([]*model.AchievementResponse, error) {
-	panic(fmt.Errorf("not implemented: Achievements - achievements"))
+	db := r.DB
+	achievementModel := model.MasterAchievement{}
+	achievements, err := achievementModel.GetAchievement(obj.Id, db)
+	return achievements, err
 }
 
 // HiroyukiVoicies is the resolver for the hiroyukiVoicies field.
