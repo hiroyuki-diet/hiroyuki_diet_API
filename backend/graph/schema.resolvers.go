@@ -16,6 +16,11 @@ func (r *achievementResolver) IsClear(ctx context.Context, obj *model.MasterAchi
 	panic(fmt.Errorf("not implemented: IsClear - isClear"))
 }
 
+// Date is the resolver for the date field.
+func (r *exerciseResolver) Date(ctx context.Context, obj *model.Exercise) (string, error) {
+	panic(fmt.Errorf("not implemented: Date - date"))
+}
+
 // LastUsedDate is the resolver for the lastUsedDate field.
 func (r *foodResolver) LastUsedDate(ctx context.Context, obj *model.Food) (string, error) {
 	date := obj.LastUsedDate.Format("2006-01-02")
@@ -93,7 +98,7 @@ func (r *mutationResolver) UseItem(ctx context.Context, input model.UUID) (model
 }
 
 // User is the resolver for the user field.
-func (r *queryResolver) User(ctx context.Context, id model.UUID, usingSkin *bool, voiceField []*model.InputFields) (*model.User, error) {
+func (r *queryResolver) User(ctx context.Context, id model.UUID) (*model.User, error) {
 	db := r.DB
 	user := model.User{}
 	userInfo, err := user.GetInfo(id, db)
@@ -117,8 +122,12 @@ func (r *userResolver) Profile(ctx context.Context, obj *model.User) (*model.Pro
 }
 
 // Exercisies is the resolver for the exercisies field.
-func (r *userResolver) Exercisies(ctx context.Context, obj *model.User) ([]*model.Exercise, error) {
-	panic(fmt.Errorf("not implemented: Exercisies - exercisies"))
+func (r *userResolver) Exercisies(ctx context.Context, obj *model.User, offset string, limit string) ([]*model.Exercise, error) {
+	db := r.DB
+	exercise := model.Exercise{}
+
+	exercises, err := exercise.GetInfo(obj.Id, offset, limit, db)
+	return exercises, err
 }
 
 // Meals is the resolver for the meals field.
@@ -138,7 +147,7 @@ func (r *userResolver) Items(ctx context.Context, obj *model.User) ([]*model.Ite
 }
 
 // HiroyukiSkins is the resolver for the hiroyukiSkins field.
-func (r *userResolver) HiroyukiSkins(ctx context.Context, obj *model.User) ([]*model.MasterHiroyukiSkin, error) {
+func (r *userResolver) HiroyukiSkins(ctx context.Context, obj *model.User, usingSkin bool) ([]*model.MasterHiroyukiSkin, error) {
 	panic(fmt.Errorf("not implemented: HiroyukiSkins - hiroyukiSkins"))
 }
 
@@ -148,12 +157,15 @@ func (r *userResolver) Achievements(ctx context.Context, obj *model.User) ([]*mo
 }
 
 // HiroyukiVoicies is the resolver for the hiroyukiVoicies field.
-func (r *userResolver) HiroyukiVoicies(ctx context.Context, obj *model.User) ([]*model.HiroyukiVoice, error) {
+func (r *userResolver) HiroyukiVoicies(ctx context.Context, obj *model.User, fields []*model.InputFields) ([]*model.HiroyukiVoice, error) {
 	panic(fmt.Errorf("not implemented: HiroyukiVoicies - hiroyukiVoicies"))
 }
 
 // Achievement returns AchievementResolver implementation.
 func (r *Resolver) Achievement() AchievementResolver { return &achievementResolver{r} }
+
+// Exercise returns ExerciseResolver implementation.
+func (r *Resolver) Exercise() ExerciseResolver { return &exerciseResolver{r} }
 
 // Food returns FoodResolver implementation.
 func (r *Resolver) Food() FoodResolver { return &foodResolver{r} }
@@ -171,22 +183,9 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 func (r *Resolver) User() UserResolver { return &userResolver{r} }
 
 type achievementResolver struct{ *Resolver }
+type exerciseResolver struct{ *Resolver }
 type foodResolver struct{ *Resolver }
 type hiroyukiSkinResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *mealResolver) TotalCalorie(ctx context.Context, obj *model.Meal) (int, error) {
-	panic(fmt.Errorf("not implemented: TotalCalorie - totalCalorie"))
-}
-func (r *Resolver) Meal() MealResolver { return &mealResolver{r} }
-type mealResolver struct{ *Resolver }
-*/

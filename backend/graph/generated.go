@@ -41,6 +41,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Achievement() AchievementResolver
+	Exercise() ExerciseResolver
 	Food() FoodResolver
 	HiroyukiSkin() HiroyukiSkinResolver
 	Mutation() MutationResolver
@@ -59,6 +60,7 @@ type ComplexityRoot struct {
 	}
 
 	Exercise struct {
+		Date func(childComplexity int) int
 		Id   func(childComplexity int) int
 		Time func(childComplexity int) int
 	}
@@ -140,7 +142,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Foods func(childComplexity int) int
-		User  func(childComplexity int, id model.UUID, usingSkin *bool, voiceField []*model.InputFields) int
+		User  func(childComplexity int, id model.UUID) int
 	}
 
 	SignUpToken struct {
@@ -152,10 +154,10 @@ type ComplexityRoot struct {
 	User struct {
 		Achievements         func(childComplexity int) int
 		Email                func(childComplexity int) int
-		Exercisies           func(childComplexity int) int
+		Exercisies           func(childComplexity int, offset string, limit string) int
 		ExperiencePoint      func(childComplexity int) int
-		HiroyukiSkins        func(childComplexity int) int
-		HiroyukiVoicies      func(childComplexity int) int
+		HiroyukiSkins        func(childComplexity int, usingSkin bool) int
+		HiroyukiVoicies      func(childComplexity int, fields []*model.InputFields) int
 		Id                   func(childComplexity int) int
 		IsTokenAuthenticated func(childComplexity int) int
 		Items                func(childComplexity int) int
@@ -168,6 +170,9 @@ type ComplexityRoot struct {
 
 type AchievementResolver interface {
 	IsClear(ctx context.Context, obj *model.MasterAchievement) (bool, error)
+}
+type ExerciseResolver interface {
+	Date(ctx context.Context, obj *model.Exercise) (string, error)
 }
 type FoodResolver interface {
 	LastUsedDate(ctx context.Context, obj *model.Food) (string, error)
@@ -191,18 +196,18 @@ type MutationResolver interface {
 	UseItem(ctx context.Context, input model.UUID) (model.UUID, error)
 }
 type QueryResolver interface {
-	User(ctx context.Context, id model.UUID, usingSkin *bool, voiceField []*model.InputFields) (*model.User, error)
+	User(ctx context.Context, id model.UUID) (*model.User, error)
 	Foods(ctx context.Context) ([]*model.Food, error)
 }
 type UserResolver interface {
 	Profile(ctx context.Context, obj *model.User) (*model.Profile, error)
 
-	Exercisies(ctx context.Context, obj *model.User) ([]*model.Exercise, error)
+	Exercisies(ctx context.Context, obj *model.User, offset string, limit string) ([]*model.Exercise, error)
 	Meals(ctx context.Context, obj *model.User) ([]*model.Meal, error)
 	Items(ctx context.Context, obj *model.User) ([]*model.ItemResponse, error)
-	HiroyukiSkins(ctx context.Context, obj *model.User) ([]*model.MasterHiroyukiSkin, error)
+	HiroyukiSkins(ctx context.Context, obj *model.User, usingSkin bool) ([]*model.MasterHiroyukiSkin, error)
 	Achievements(ctx context.Context, obj *model.User) ([]*model.MasterAchievement, error)
-	HiroyukiVoicies(ctx context.Context, obj *model.User) ([]*model.HiroyukiVoice, error)
+	HiroyukiVoicies(ctx context.Context, obj *model.User, fields []*model.InputFields) ([]*model.HiroyukiVoice, error)
 }
 
 type executableSchema struct {
@@ -244,6 +249,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Achievement.Name(childComplexity), true
+
+	case "Exercise.date":
+		if e.complexity.Exercise.Date == nil {
+			break
+		}
+
+		return e.complexity.Exercise.Date(childComplexity), true
 
 	case "Exercise.id":
 		if e.complexity.Exercise.Id == nil {
@@ -693,7 +705,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Query.User(childComplexity, args["id"].(model.UUID), args["usingSkin"].(*bool), args["voiceField"].([]*model.InputFields)), true
+		return e.complexity.Query.User(childComplexity, args["id"].(model.UUID)), true
 
 	case "SignUpToken.id":
 		if e.complexity.SignUpToken.Id == nil {
@@ -735,7 +747,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			break
 		}
 
-		return e.complexity.User.Exercisies(childComplexity), true
+		args, err := ec.field_User_exercisies_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.Exercisies(childComplexity, args["offset"].(string), args["limit"].(string)), true
 
 	case "User.experiencePoInt":
 		if e.complexity.User.ExperiencePoint == nil {
@@ -749,14 +766,24 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			break
 		}
 
-		return e.complexity.User.HiroyukiSkins(childComplexity), true
+		args, err := ec.field_User_hiroyukiSkins_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.HiroyukiSkins(childComplexity, args["usingSkin"].(bool)), true
 
 	case "User.hiroyukiVoicies":
 		if e.complexity.User.HiroyukiVoicies == nil {
 			break
 		}
 
-		return e.complexity.User.HiroyukiVoicies(childComplexity), true
+		args, err := ec.field_User_hiroyukiVoicies_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.HiroyukiVoicies(childComplexity, args["fields"].([]*model.InputFields)), true
 
 	case "User.id":
 		if e.complexity.User.Id == nil {
@@ -1246,16 +1273,6 @@ func (ec *executionContext) field_Query_user_args(ctx context.Context, rawArgs m
 		return nil, err
 	}
 	args["id"] = arg0
-	arg1, err := ec.field_Query_user_argsUsingSkin(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["usingSkin"] = arg1
-	arg2, err := ec.field_Query_user_argsVoiceField(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["voiceField"] = arg2
 	return args, nil
 }
 func (ec *executionContext) field_Query_user_argsID(
@@ -1271,26 +1288,87 @@ func (ec *executionContext) field_Query_user_argsID(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Query_user_argsUsingSkin(
+func (ec *executionContext) field_User_exercisies_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_User_exercisies_argsOffset(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["offset"] = arg0
+	arg1, err := ec.field_User_exercisies_argsLimit(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["limit"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_User_exercisies_argsOffset(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (*bool, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("usingSkin"))
-	if tmp, ok := rawArgs["usingSkin"]; ok {
-		return ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+	if tmp, ok := rawArgs["offset"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
 	}
 
-	var zeroVal *bool
+	var zeroVal string
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Query_user_argsVoiceField(
+func (ec *executionContext) field_User_exercisies_argsLimit(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+	if tmp, ok := rawArgs["limit"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_User_hiroyukiSkins_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_User_hiroyukiSkins_argsUsingSkin(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["usingSkin"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_User_hiroyukiSkins_argsUsingSkin(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (bool, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("usingSkin"))
+	if tmp, ok := rawArgs["usingSkin"]; ok {
+		return ec.unmarshalNBoolean2bool(ctx, tmp)
+	}
+
+	var zeroVal bool
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_User_hiroyukiVoicies_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_User_hiroyukiVoicies_argsFields(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["fields"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_User_hiroyukiVoicies_argsFields(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) ([]*model.InputFields, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("voiceField"))
-	if tmp, ok := rawArgs["voiceField"]; ok {
-		return ec.unmarshalOInputFields2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFieldsᚄ(ctx, tmp)
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("fields"))
+	if tmp, ok := rawArgs["fields"]; ok {
+		return ec.unmarshalNInputFields2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFieldsᚄ(ctx, tmp)
 	}
 
 	var zeroVal []*model.InputFields
@@ -1612,6 +1690,50 @@ func (ec *executionContext) fieldContext_Exercise_time(_ context.Context, field 
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Exercise_date(ctx context.Context, field graphql.CollectedField, obj *model.Exercise) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Exercise_date(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Exercise().Date(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Exercise_date(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Exercise",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4020,7 +4142,7 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().User(rctx, fc.Args["id"].(model.UUID), fc.Args["usingSkin"].(*bool), fc.Args["voiceField"].([]*model.InputFields))
+		return ec.resolvers.Query().User(rctx, fc.Args["id"].(model.UUID))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4760,7 +4882,7 @@ func (ec *executionContext) _User_exercisies(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().Exercisies(rctx, obj)
+		return ec.resolvers.User().Exercisies(rctx, obj, fc.Args["offset"].(string), fc.Args["limit"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4774,7 +4896,7 @@ func (ec *executionContext) _User_exercisies(ctx context.Context, field graphql.
 	return ec.marshalOExercise2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐExerciseᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_exercisies(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_exercisies(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -4786,9 +4908,22 @@ func (ec *executionContext) fieldContext_User_exercisies(_ context.Context, fiel
 				return ec.fieldContext_Exercise_id(ctx, field)
 			case "time":
 				return ec.fieldContext_Exercise_time(ctx, field)
+			case "date":
+				return ec.fieldContext_Exercise_date(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Exercise", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_User_exercisies_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -4911,7 +5046,7 @@ func (ec *executionContext) _User_hiroyukiSkins(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().HiroyukiSkins(rctx, obj)
+		return ec.resolvers.User().HiroyukiSkins(rctx, obj, fc.Args["usingSkin"].(bool))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4928,7 +5063,7 @@ func (ec *executionContext) _User_hiroyukiSkins(ctx context.Context, field graph
 	return ec.marshalNHiroyukiSkin2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterHiroyukiSkinᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_hiroyukiSkins(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_hiroyukiSkins(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -4955,6 +5090,17 @@ func (ec *executionContext) fieldContext_User_hiroyukiSkins(_ context.Context, f
 			}
 			return nil, fmt.Errorf("no field named %q was found under type HiroyukiSkin", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_User_hiroyukiSkins_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -5025,7 +5171,7 @@ func (ec *executionContext) _User_hiroyukiVoicies(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().HiroyukiVoicies(rctx, obj)
+		return ec.resolvers.User().HiroyukiVoicies(rctx, obj, fc.Args["fields"].([]*model.InputFields))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5042,7 +5188,7 @@ func (ec *executionContext) _User_hiroyukiVoicies(ctx context.Context, field gra
 	return ec.marshalNHiroyukiVoice2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐHiroyukiVoiceᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_hiroyukiVoicies(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_hiroyukiVoicies(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -5063,6 +5209,17 @@ func (ec *executionContext) fieldContext_User_hiroyukiVoicies(_ context.Context,
 			}
 			return nil, fmt.Errorf("no field named %q was found under type HiroyukiVoice", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_User_hiroyukiVoicies_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -7462,13 +7619,49 @@ func (ec *executionContext) _Exercise(ctx context.Context, sel ast.SelectionSet,
 		case "id":
 			out.Values[i] = ec._Exercise_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "time":
 			out.Values[i] = ec._Exercise_time(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "date":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Exercise_date(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9344,6 +9537,21 @@ func (ec *executionContext) unmarshalNInputExercise2githubᚗcomᚋmoXXchaᚋhir
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNInputFields2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFieldsᚄ(ctx context.Context, v any) ([]*model.InputFields, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*model.InputFields, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNInputFields2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFields(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (ec *executionContext) unmarshalNInputFields2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFields(ctx context.Context, v any) (*model.InputFields, error) {
 	res, err := ec.unmarshalInputInputFields(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
@@ -9841,24 +10049,6 @@ func (ec *executionContext) marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet
 		return graphql.Null
 	}
 	return v
-}
-
-func (ec *executionContext) unmarshalOInputFields2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFieldsᚄ(ctx context.Context, v any) ([]*model.InputFields, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []any
-	vSlice = graphql.CoerceList(v)
-	var err error
-	res := make([]*model.InputFields, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNInputFields2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFields(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
 }
 
 func (ec *executionContext) unmarshalOInt2int(ctx context.Context, v any) (int, error) {
