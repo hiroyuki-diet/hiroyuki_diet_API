@@ -110,7 +110,7 @@ type User {
   meals: [Meal!]
   meal(id: ID!): Meal!
   items: [ItemResponse!]
-  hiroyukiSkins(usingSkin: Boolean!): [HiroyukiSkin!]!
+  hiroyukiSkins(usingSkin: Boolean!): [SkinResponse!]!
   achievements: [Achievement!]!
   hiroyukiVoicies(fields: [InputFields!]!): [HiroyukiVoice!]!
 }
@@ -133,7 +133,7 @@ type Achievement {
   isClear: Boolean!
 }
 
-type HiroyukiSkin {
+type SkinResponse {
   id: ID!
   name: String!
   description: String!

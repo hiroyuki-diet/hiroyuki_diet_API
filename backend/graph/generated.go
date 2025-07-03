@@ -43,7 +43,6 @@ type ResolverRoot interface {
 	Achievement() AchievementResolver
 	Exercise() ExerciseResolver
 	Food() FoodResolver
-	HiroyukiSkin() HiroyukiSkinResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 	User() UserResolver
@@ -75,17 +74,6 @@ type ComplexityRoot struct {
 		Id              func(childComplexity int) int
 		LastUsedDate    func(childComplexity int) int
 		Name            func(childComplexity int) int
-	}
-
-	HiroyukiSkin struct {
-		Description  func(childComplexity int) int
-		Id           func(childComplexity int) int
-		IsHaving     func(childComplexity int) int
-		IsUsing      func(childComplexity int) int
-		Name         func(childComplexity int) int
-		Part         func(childComplexity int) int
-		ReleaseLevel func(childComplexity int) int
-		SkinImage    func(childComplexity int) int
 	}
 
 	HiroyukiVoice struct {
@@ -151,6 +139,17 @@ type ComplexityRoot struct {
 		Token       func(childComplexity int) int
 	}
 
+	SkinResponse struct {
+		Description  func(childComplexity int) int
+		Id           func(childComplexity int) int
+		IsHaving     func(childComplexity int) int
+		IsUsing      func(childComplexity int) int
+		Name         func(childComplexity int) int
+		Part         func(childComplexity int) int
+		ReleaseLevel func(childComplexity int) int
+		SkinImage    func(childComplexity int) int
+	}
+
 	User struct {
 		Achievements         func(childComplexity int) int
 		Email                func(childComplexity int) int
@@ -178,10 +177,6 @@ type ExerciseResolver interface {
 type FoodResolver interface {
 	LastUsedDate(ctx context.Context, obj *model.Food) (string, error)
 }
-type HiroyukiSkinResolver interface {
-	IsUsing(ctx context.Context, obj *model.MasterHiroyukiSkin) (bool, error)
-	IsHaving(ctx context.Context, obj *model.MasterHiroyukiSkin) (bool, error)
-}
 type MutationResolver interface {
 	SignUp(ctx context.Context, input model.Auth) (string, error)
 	Login(ctx context.Context, input model.Auth) (string, error)
@@ -207,7 +202,7 @@ type UserResolver interface {
 	Meals(ctx context.Context, obj *model.User) ([]*model.Meal, error)
 	Meal(ctx context.Context, obj *model.User, id model.UUID) (*model.Meal, error)
 	Items(ctx context.Context, obj *model.User) ([]*model.ItemResponse, error)
-	HiroyukiSkins(ctx context.Context, obj *model.User, usingSkin bool) ([]*model.MasterHiroyukiSkin, error)
+	HiroyukiSkins(ctx context.Context, obj *model.User, usingSkin bool) ([]*model.SkinResponse, error)
 	Achievements(ctx context.Context, obj *model.User) ([]*model.MasterAchievement, error)
 	HiroyukiVoicies(ctx context.Context, obj *model.User, fields []*model.InputFields) ([]*model.HiroyukiVoice, error)
 }
@@ -314,62 +309,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Food.Name(childComplexity), true
-
-	case "HiroyukiSkin.description":
-		if e.complexity.HiroyukiSkin.Description == nil {
-			break
-		}
-
-		return e.complexity.HiroyukiSkin.Description(childComplexity), true
-
-	case "HiroyukiSkin.id":
-		if e.complexity.HiroyukiSkin.Id == nil {
-			break
-		}
-
-		return e.complexity.HiroyukiSkin.Id(childComplexity), true
-
-	case "HiroyukiSkin.isHaving":
-		if e.complexity.HiroyukiSkin.IsHaving == nil {
-			break
-		}
-
-		return e.complexity.HiroyukiSkin.IsHaving(childComplexity), true
-
-	case "HiroyukiSkin.isUsing":
-		if e.complexity.HiroyukiSkin.IsUsing == nil {
-			break
-		}
-
-		return e.complexity.HiroyukiSkin.IsUsing(childComplexity), true
-
-	case "HiroyukiSkin.name":
-		if e.complexity.HiroyukiSkin.Name == nil {
-			break
-		}
-
-		return e.complexity.HiroyukiSkin.Name(childComplexity), true
-
-	case "HiroyukiSkin.part":
-		if e.complexity.HiroyukiSkin.Part == nil {
-			break
-		}
-
-		return e.complexity.HiroyukiSkin.Part(childComplexity), true
-
-	case "HiroyukiSkin.releaseLevel":
-		if e.complexity.HiroyukiSkin.ReleaseLevel == nil {
-			break
-		}
-
-		return e.complexity.HiroyukiSkin.ReleaseLevel(childComplexity), true
-
-	case "HiroyukiSkin.skinImage":
-		if e.complexity.HiroyukiSkin.SkinImage == nil {
-			break
-		}
-
-		return e.complexity.HiroyukiSkin.SkinImage(childComplexity), true
 
 	case "HiroyukiVoice.fields":
 		if e.complexity.HiroyukiVoice.Fields == nil {
@@ -729,6 +668,62 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.SignUpToken.Token(childComplexity), true
+
+	case "SkinResponse.description":
+		if e.complexity.SkinResponse.Description == nil {
+			break
+		}
+
+		return e.complexity.SkinResponse.Description(childComplexity), true
+
+	case "SkinResponse.id":
+		if e.complexity.SkinResponse.Id == nil {
+			break
+		}
+
+		return e.complexity.SkinResponse.Id(childComplexity), true
+
+	case "SkinResponse.isHaving":
+		if e.complexity.SkinResponse.IsHaving == nil {
+			break
+		}
+
+		return e.complexity.SkinResponse.IsHaving(childComplexity), true
+
+	case "SkinResponse.isUsing":
+		if e.complexity.SkinResponse.IsUsing == nil {
+			break
+		}
+
+		return e.complexity.SkinResponse.IsUsing(childComplexity), true
+
+	case "SkinResponse.name":
+		if e.complexity.SkinResponse.Name == nil {
+			break
+		}
+
+		return e.complexity.SkinResponse.Name(childComplexity), true
+
+	case "SkinResponse.part":
+		if e.complexity.SkinResponse.Part == nil {
+			break
+		}
+
+		return e.complexity.SkinResponse.Part(childComplexity), true
+
+	case "SkinResponse.releaseLevel":
+		if e.complexity.SkinResponse.ReleaseLevel == nil {
+			break
+		}
+
+		return e.complexity.SkinResponse.ReleaseLevel(childComplexity), true
+
+	case "SkinResponse.skinImage":
+		if e.complexity.SkinResponse.SkinImage == nil {
+			break
+		}
+
+		return e.complexity.SkinResponse.SkinImage(childComplexity), true
 
 	case "User.achievements":
 		if e.complexity.User.Achievements == nil {
@@ -2035,358 +2030,6 @@ func (ec *executionContext) fieldContext_Food_lastUsedDate(_ context.Context, fi
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _HiroyukiSkin_id(ctx context.Context, field graphql.CollectedField, obj *model.MasterHiroyukiSkin) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_HiroyukiSkin_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Id, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(model.UUID)
-	fc.Result = res
-	return ec.marshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_HiroyukiSkin_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "HiroyukiSkin",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _HiroyukiSkin_name(ctx context.Context, field graphql.CollectedField, obj *model.MasterHiroyukiSkin) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_HiroyukiSkin_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_HiroyukiSkin_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "HiroyukiSkin",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _HiroyukiSkin_description(ctx context.Context, field graphql.CollectedField, obj *model.MasterHiroyukiSkin) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_HiroyukiSkin_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_HiroyukiSkin_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "HiroyukiSkin",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _HiroyukiSkin_part(ctx context.Context, field graphql.CollectedField, obj *model.MasterHiroyukiSkin) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_HiroyukiSkin_part(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Part, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(utils.SkinPart)
-	fc.Result = res
-	return ec.marshalNSkinPartEnum2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋutilsᚐSkinPart(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_HiroyukiSkin_part(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "HiroyukiSkin",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type SkinPartEnum does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _HiroyukiSkin_skinImage(ctx context.Context, field graphql.CollectedField, obj *model.MasterHiroyukiSkin) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_HiroyukiSkin_skinImage(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SkinImage, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_HiroyukiSkin_skinImage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "HiroyukiSkin",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _HiroyukiSkin_releaseLevel(ctx context.Context, field graphql.CollectedField, obj *model.MasterHiroyukiSkin) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_HiroyukiSkin_releaseLevel(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ReleaseLevel, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_HiroyukiSkin_releaseLevel(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "HiroyukiSkin",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _HiroyukiSkin_isUsing(ctx context.Context, field graphql.CollectedField, obj *model.MasterHiroyukiSkin) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_HiroyukiSkin_isUsing(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.HiroyukiSkin().IsUsing(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_HiroyukiSkin_isUsing(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "HiroyukiSkin",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _HiroyukiSkin_isHaving(ctx context.Context, field graphql.CollectedField, obj *model.MasterHiroyukiSkin) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_HiroyukiSkin_isHaving(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.HiroyukiSkin().IsHaving(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_HiroyukiSkin_isHaving(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "HiroyukiSkin",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4567,6 +4210,358 @@ func (ec *executionContext) fieldContext_SignUpToken_surviveTime(_ context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _SkinResponse_id(ctx context.Context, field graphql.CollectedField, obj *model.SkinResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SkinResponse_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Id, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.UUID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SkinResponse_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SkinResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SkinResponse_name(ctx context.Context, field graphql.CollectedField, obj *model.SkinResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SkinResponse_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SkinResponse_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SkinResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SkinResponse_description(ctx context.Context, field graphql.CollectedField, obj *model.SkinResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SkinResponse_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SkinResponse_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SkinResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SkinResponse_part(ctx context.Context, field graphql.CollectedField, obj *model.SkinResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SkinResponse_part(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Part, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(utils.SkinPart)
+	fc.Result = res
+	return ec.marshalNSkinPartEnum2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋutilsᚐSkinPart(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SkinResponse_part(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SkinResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type SkinPartEnum does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SkinResponse_skinImage(ctx context.Context, field graphql.CollectedField, obj *model.SkinResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SkinResponse_skinImage(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SkinImage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SkinResponse_skinImage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SkinResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SkinResponse_releaseLevel(ctx context.Context, field graphql.CollectedField, obj *model.SkinResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SkinResponse_releaseLevel(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReleaseLevel, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SkinResponse_releaseLevel(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SkinResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SkinResponse_isUsing(ctx context.Context, field graphql.CollectedField, obj *model.SkinResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SkinResponse_isUsing(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsUsing, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SkinResponse_isUsing(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SkinResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SkinResponse_isHaving(ctx context.Context, field graphql.CollectedField, obj *model.SkinResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SkinResponse_isHaving(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsHaving, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SkinResponse_isHaving(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SkinResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_id(ctx, field)
 	if err != nil {
@@ -5162,9 +5157,9 @@ func (ec *executionContext) _User_hiroyukiSkins(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.MasterHiroyukiSkin)
+	res := resTmp.([]*model.SkinResponse)
 	fc.Result = res
-	return ec.marshalNHiroyukiSkin2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterHiroyukiSkinᚄ(ctx, field.Selections, res)
+	return ec.marshalNSkinResponse2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐSkinResponseᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_hiroyukiSkins(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5176,23 +5171,23 @@ func (ec *executionContext) fieldContext_User_hiroyukiSkins(ctx context.Context,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_HiroyukiSkin_id(ctx, field)
+				return ec.fieldContext_SkinResponse_id(ctx, field)
 			case "name":
-				return ec.fieldContext_HiroyukiSkin_name(ctx, field)
+				return ec.fieldContext_SkinResponse_name(ctx, field)
 			case "description":
-				return ec.fieldContext_HiroyukiSkin_description(ctx, field)
+				return ec.fieldContext_SkinResponse_description(ctx, field)
 			case "part":
-				return ec.fieldContext_HiroyukiSkin_part(ctx, field)
+				return ec.fieldContext_SkinResponse_part(ctx, field)
 			case "skinImage":
-				return ec.fieldContext_HiroyukiSkin_skinImage(ctx, field)
+				return ec.fieldContext_SkinResponse_skinImage(ctx, field)
 			case "releaseLevel":
-				return ec.fieldContext_HiroyukiSkin_releaseLevel(ctx, field)
+				return ec.fieldContext_SkinResponse_releaseLevel(ctx, field)
 			case "isUsing":
-				return ec.fieldContext_HiroyukiSkin_isUsing(ctx, field)
+				return ec.fieldContext_SkinResponse_isUsing(ctx, field)
 			case "isHaving":
-				return ec.fieldContext_HiroyukiSkin_isHaving(ctx, field)
+				return ec.fieldContext_SkinResponse_isHaving(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type HiroyukiSkin", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type SkinResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -7918,142 +7913,6 @@ func (ec *executionContext) _Food(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
-var hiroyukiSkinImplementors = []string{"HiroyukiSkin"}
-
-func (ec *executionContext) _HiroyukiSkin(ctx context.Context, sel ast.SelectionSet, obj *model.MasterHiroyukiSkin) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, hiroyukiSkinImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("HiroyukiSkin")
-		case "id":
-			out.Values[i] = ec._HiroyukiSkin_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "name":
-			out.Values[i] = ec._HiroyukiSkin_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "description":
-			out.Values[i] = ec._HiroyukiSkin_description(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "part":
-			out.Values[i] = ec._HiroyukiSkin_part(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "skinImage":
-			out.Values[i] = ec._HiroyukiSkin_skinImage(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "releaseLevel":
-			out.Values[i] = ec._HiroyukiSkin_releaseLevel(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "isUsing":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._HiroyukiSkin_isUsing(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "isHaving":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._HiroyukiSkin_isHaving(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
 var hiroyukiVoiceImplementors = []string{"HiroyukiVoice"}
 
 func (ec *executionContext) _HiroyukiVoice(ctx context.Context, sel ast.SelectionSet, obj *model.HiroyukiVoice) graphql.Marshaler {
@@ -8555,6 +8414,80 @@ func (ec *executionContext) _SignUpToken(ctx context.Context, sel ast.SelectionS
 			}
 		case "surviveTime":
 			out.Values[i] = ec._SignUpToken_surviveTime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var skinResponseImplementors = []string{"SkinResponse"}
+
+func (ec *executionContext) _SkinResponse(ctx context.Context, sel ast.SelectionSet, obj *model.SkinResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, skinResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SkinResponse")
+		case "id":
+			out.Values[i] = ec._SkinResponse_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._SkinResponse_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "description":
+			out.Values[i] = ec._SkinResponse_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "part":
+			out.Values[i] = ec._SkinResponse_part(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "skinImage":
+			out.Values[i] = ec._SkinResponse_skinImage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "releaseLevel":
+			out.Values[i] = ec._SkinResponse_releaseLevel(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "isUsing":
+			out.Values[i] = ec._SkinResponse_isUsing(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "isHaving":
+			out.Values[i] = ec._SkinResponse_isHaving(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -9554,60 +9487,6 @@ func (ec *executionContext) marshalNGenderEnum2githubᚗcomᚋmoXXchaᚋhiroyuki
 	return res
 }
 
-func (ec *executionContext) marshalNHiroyukiSkin2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterHiroyukiSkinᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.MasterHiroyukiSkin) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNHiroyukiSkin2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterHiroyukiSkin(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalNHiroyukiSkin2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMasterHiroyukiSkin(ctx context.Context, sel ast.SelectionSet, v *model.MasterHiroyukiSkin) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._HiroyukiSkin(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNHiroyukiVoice2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐHiroyukiVoiceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.HiroyukiVoice) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -9817,6 +9696,60 @@ func (ec *executionContext) marshalNSkinPartEnum2githubᚗcomᚋmoXXchaᚋhiroyu
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNSkinResponse2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐSkinResponseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.SkinResponse) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNSkinResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐSkinResponse(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNSkinResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐSkinResponse(ctx context.Context, sel ast.SelectionSet, v *model.SkinResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._SkinResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {

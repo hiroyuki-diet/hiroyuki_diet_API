@@ -158,8 +158,6 @@ models:
         resolver: true
       items:
         resolver: true
-      hiroyukiSkins:
-        resolver: true
       achievements:
         resolver: true
       hiroyukiVocies:
@@ -178,15 +176,6 @@ models:
     fields:
       isClear:
         resolver: true
-  HiroyukiSkin:
-    model: github.com/moXXcha/hiroyuki_diet_API/graph/model.MasterHiroyukiSkin
-    fields:
-      isUsing:
-        resolver: true
-      isHaving:
-        resolver: true
-  Item:
-    model: github.com/moXXcha/hiroyuki_diet_API/graph/model.UserItem
 
     # The GraphQL spec explicitly states that the Int type is a signed 32-bit
     # integer. Using Go int or int64 to represent it can lead to unexpected
