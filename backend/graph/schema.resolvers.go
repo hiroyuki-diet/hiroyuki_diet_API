@@ -156,7 +156,7 @@ func (r *userResolver) Achievements(ctx context.Context, obj *model.User) ([]*mo
 }
 
 // HiroyukiVoicies is the resolver for the hiroyukiVoicies field.
-func (r *userResolver) HiroyukiVoicies(ctx context.Context, obj *model.User, fields []*model.InputFields) ([]*model.HiroyukiVoice, error) {
+func (r *userResolver) HiroyukiVoicies(ctx context.Context, obj *model.User, fields []*model.InputFields) ([]*model.HiroyukiVoiceResponse, error) {
 	panic(fmt.Errorf("not implemented: HiroyukiVoicies - hiroyukiVoicies"))
 }
 
@@ -180,17 +180,3 @@ type foodResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *achievementResolver) IsClear(ctx context.Context, obj *model.MasterAchievement) (bool, error) {
-	panic(fmt.Errorf("not implemented: IsClear - isClear"))
-}
-func (r *Resolver) Achievement() AchievementResolver { return &achievementResolver{r} }
-type achievementResolver struct{ *Resolver }
-*/
