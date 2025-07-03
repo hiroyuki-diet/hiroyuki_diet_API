@@ -138,6 +138,11 @@ func (r *userResolver) Meals(ctx context.Context, obj *model.User) ([]*model.Mea
 	return meals, err
 }
 
+// Meal is the resolver for the meal field.
+func (r *userResolver) Meal(ctx context.Context, obj *model.User, id model.UUID) (*model.Meal, error) {
+	panic(fmt.Errorf("not implemented: Meal - meal"))
+}
+
 // Items is the resolver for the items field.
 func (r *userResolver) Items(ctx context.Context, obj *model.User) ([]*model.ItemResponse, error) {
 	db := r.DB

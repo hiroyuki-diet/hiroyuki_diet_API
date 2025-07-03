@@ -108,6 +108,7 @@ type User {
   experiencePoInt: Int!
   exercisies(offset: String!, limit: String!): [Exercise!]
   meals: [Meal!]
+  meal(id: ID!): Meal!
   items: [ItemResponse!]
   hiroyukiSkins(usingSkin: Boolean!): [HiroyukiSkin!]!
   achievements: [Achievement!]!
