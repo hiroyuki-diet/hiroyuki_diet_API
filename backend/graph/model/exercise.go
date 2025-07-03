@@ -49,3 +49,23 @@ func (*Exercise) Seeder(db *gorm.DB) error {
 
 	return nil
 }
+
+func (*Exercise) GetInfo(id UUID, offset string, limit string, db *gorm.DB) ([]*Exercise, error) {
+	var exercises []*Exercise
+
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	err := db.
+		Where("user_id = ?", id).
+		Where("date BETWEEN ? AND ?", offset, limit).
+		Order("date asc").
+		Find(&exercises).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return exercises, nil
+}

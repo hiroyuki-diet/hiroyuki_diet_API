@@ -123,7 +123,11 @@ func (r *userResolver) Profile(ctx context.Context, obj *model.User) (*model.Pro
 
 // Exercisies is the resolver for the exercisies field.
 func (r *userResolver) Exercisies(ctx context.Context, obj *model.User, offset string, limit string) ([]*model.Exercise, error) {
-	panic(fmt.Errorf("not implemented: Exercisies - exercisies"))
+	db := r.DB
+	exercise := model.Exercise{}
+
+	exercises, err := exercise.GetInfo(obj.Id, offset, limit, db)
+	return exercises, err
 }
 
 // Meals is the resolver for the meals field.
