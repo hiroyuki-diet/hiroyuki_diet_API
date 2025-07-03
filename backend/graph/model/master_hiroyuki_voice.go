@@ -18,16 +18,21 @@ type MasterHiroyukiVoice struct {
 }
 
 func (*MasterHiroyukiVoice) FirstCreate(db *gorm.DB) error {
+	var fields []MasterField
+	fieldsStr := []string{"home", "chibi_hiroyuki"}
+
+	err := db.Where("field IN ?", fieldsStr).Find(&fields).Error
+
+	if err != nil {
+		return err
+	}
+
 	voicies := []MasterHiroyukiVoice{
 		{
 			Name:         "よろしく",
 			VoiceUrl:     "",
 			ReleaseLevel: 0,
-			VoiceFields: []MasterField{{
-				Field: "home",
-			}, {
-				Field: "chibi_hiroyuki",
-			}},
+			VoiceFields:  fields,
 		},
 	}
 
