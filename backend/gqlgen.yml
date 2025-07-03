@@ -154,6 +154,8 @@ models:
         resolver: true
       meals:
         resolver: true
+      meal:
+        resolver: true
       items:
         resolver: true
       hiroyukiSkins:
