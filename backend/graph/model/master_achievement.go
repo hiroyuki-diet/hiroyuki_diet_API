@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -34,4 +35,28 @@ func (*MasterAchievement) FirstCreate(db *gorm.DB) error {
 		}
 	}
 	return nil
+}
+
+func (*MasterAchievement) GetAchievement(id UUID, db *gorm.DB) ([]*AchievementResponse, error) {
+	var achievements []*AchievementResponse
+
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	err := db.
+		Table("master_achievements").
+		Select(`
+			master_achievements.id,
+			master_achievements.name,
+			COALESCE(user_achievements.is_clear, false) AS is_clear
+		`).
+		Joins(`
+			LEFT JOIN user_achievements 
+			ON master_achievements.id = user_achievements.achievement_id 
+			AND user_achievements.user_id = ?
+		`, id).
+		Scan(&achievements).Error
+
+	return achievements, err
 }

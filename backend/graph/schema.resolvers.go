@@ -11,11 +11,6 @@ import (
 	"github.com/moXXcha/hiroyuki_diet_API/graph/model"
 )
 
-// IsClear is the resolver for the isClear field.
-func (r *achievementResolver) IsClear(ctx context.Context, obj *model.MasterAchievement) (bool, error) {
-	panic(fmt.Errorf("not implemented: IsClear - isClear"))
-}
-
 // Date is the resolver for the date field.
 func (r *exerciseResolver) Date(ctx context.Context, obj *model.Exercise) (string, error) {
 	return obj.Date.Format("2006-01-02"), nil
@@ -153,17 +148,17 @@ func (r *userResolver) HiroyukiSkins(ctx context.Context, obj *model.User, using
 }
 
 // Achievements is the resolver for the achievements field.
-func (r *userResolver) Achievements(ctx context.Context, obj *model.User) ([]*model.MasterAchievement, error) {
-	panic(fmt.Errorf("not implemented: Achievements - achievements"))
+func (r *userResolver) Achievements(ctx context.Context, obj *model.User) ([]*model.AchievementResponse, error) {
+	db := r.DB
+	achievementModel := model.MasterAchievement{}
+	achievements, err := achievementModel.GetAchievement(obj.Id, db)
+	return achievements, err
 }
 
 // HiroyukiVoicies is the resolver for the hiroyukiVoicies field.
 func (r *userResolver) HiroyukiVoicies(ctx context.Context, obj *model.User, fields []*model.InputFields) ([]*model.HiroyukiVoice, error) {
 	panic(fmt.Errorf("not implemented: HiroyukiVoicies - hiroyukiVoicies"))
 }
-
-// Achievement returns AchievementResolver implementation.
-func (r *Resolver) Achievement() AchievementResolver { return &achievementResolver{r} }
 
 // Exercise returns ExerciseResolver implementation.
 func (r *Resolver) Exercise() ExerciseResolver { return &exerciseResolver{r} }
@@ -180,9 +175,22 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 // User returns UserResolver implementation.
 func (r *Resolver) User() UserResolver { return &userResolver{r} }
 
-type achievementResolver struct{ *Resolver }
 type exerciseResolver struct{ *Resolver }
 type foodResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *achievementResolver) IsClear(ctx context.Context, obj *model.MasterAchievement) (bool, error) {
+	panic(fmt.Errorf("not implemented: IsClear - isClear"))
+}
+func (r *Resolver) Achievement() AchievementResolver { return &achievementResolver{r} }
+type achievementResolver struct{ *Resolver }
+*/

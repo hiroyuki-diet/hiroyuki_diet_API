@@ -111,7 +111,7 @@ type User {
   meal(id: ID!): Meal!
   items: [ItemResponse!]
   hiroyukiSkins(usingSkin: Boolean!): [SkinResponse!]!
-  achievements: [Achievement!]!
+  achievements: [AchievementResponse!]!
   hiroyukiVoicies(fields: [InputFields!]!): [HiroyukiVoice!]!
 }
 
@@ -127,7 +127,7 @@ type Field {
   field: FieldEnum!
 }
 
-type Achievement {
+type AchievementResponse {
   id: ID!
   name: String!
   isClear: Boolean!
