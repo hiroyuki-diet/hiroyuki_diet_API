@@ -27,16 +27,6 @@ func (r *foodResolver) LastUsedDate(ctx context.Context, obj *model.Food) (strin
 	return date, nil
 }
 
-// IsUsing is the resolver for the isUsing field.
-func (r *hiroyukiSkinResolver) IsUsing(ctx context.Context, obj *model.MasterHiroyukiSkin) (bool, error) {
-	panic(fmt.Errorf("not implemented: IsUsing - isUsing"))
-}
-
-// IsHaving is the resolver for the isHaving field.
-func (r *hiroyukiSkinResolver) IsHaving(ctx context.Context, obj *model.MasterHiroyukiSkin) (bool, error) {
-	panic(fmt.Errorf("not implemented: IsHaving - isHaving"))
-}
-
 // SignUp is the resolver for the signUp field.
 func (r *mutationResolver) SignUp(ctx context.Context, input model.Auth) (string, error) {
 	panic(fmt.Errorf("not implemented: SignUp - signUp"))
@@ -155,8 +145,11 @@ func (r *userResolver) Items(ctx context.Context, obj *model.User) ([]*model.Ite
 }
 
 // HiroyukiSkins is the resolver for the hiroyukiSkins field.
-func (r *userResolver) HiroyukiSkins(ctx context.Context, obj *model.User, usingSkin bool) ([]*model.MasterHiroyukiSkin, error) {
-	panic(fmt.Errorf("not implemented: HiroyukiSkins - hiroyukiSkins"))
+func (r *userResolver) HiroyukiSkins(ctx context.Context, obj *model.User, usingSkin bool) ([]*model.SkinResponse, error) {
+	db := r.DB
+	skinModel := model.MasterHiroyukiSkin{}
+	skins, err := skinModel.GetSkins(obj.Id, usingSkin, db)
+	return skins, err
 }
 
 // Achievements is the resolver for the achievements field.
@@ -178,9 +171,6 @@ func (r *Resolver) Exercise() ExerciseResolver { return &exerciseResolver{r} }
 // Food returns FoodResolver implementation.
 func (r *Resolver) Food() FoodResolver { return &foodResolver{r} }
 
-// HiroyukiSkin returns HiroyukiSkinResolver implementation.
-func (r *Resolver) HiroyukiSkin() HiroyukiSkinResolver { return &hiroyukiSkinResolver{r} }
-
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
@@ -193,7 +183,6 @@ func (r *Resolver) User() UserResolver { return &userResolver{r} }
 type achievementResolver struct{ *Resolver }
 type exerciseResolver struct{ *Resolver }
 type foodResolver struct{ *Resolver }
-type hiroyukiSkinResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
