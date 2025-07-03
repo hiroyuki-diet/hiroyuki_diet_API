@@ -112,7 +112,7 @@ type User {
   items: [ItemResponse!]
   hiroyukiSkins(usingSkin: Boolean!): [SkinResponse!]!
   achievements: [AchievementResponse!]!
-  hiroyukiVoicies(fields: [InputFields!]!): [HiroyukiVoiceResponse!]!
+  hiroyukiVoicies(fields: InputFields!): [HiroyukiVoiceResponse!]!
 }
 
 type HiroyukiVoiceResponse {

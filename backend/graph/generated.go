@@ -155,7 +155,7 @@ type ComplexityRoot struct {
 		Exercisies           func(childComplexity int, offset string, limit string) int
 		ExperiencePoint      func(childComplexity int) int
 		HiroyukiSkins        func(childComplexity int, usingSkin bool) int
-		HiroyukiVoicies      func(childComplexity int, fields []*model.InputFields) int
+		HiroyukiVoicies      func(childComplexity int, fields model.InputFields) int
 		Id                   func(childComplexity int) int
 		IsTokenAuthenticated func(childComplexity int) int
 		Items                func(childComplexity int) int
@@ -200,7 +200,7 @@ type UserResolver interface {
 	Items(ctx context.Context, obj *model.User) ([]*model.ItemResponse, error)
 	HiroyukiSkins(ctx context.Context, obj *model.User, usingSkin bool) ([]*model.SkinResponse, error)
 	Achievements(ctx context.Context, obj *model.User) ([]*model.AchievementResponse, error)
-	HiroyukiVoicies(ctx context.Context, obj *model.User, fields []*model.InputFields) ([]*model.HiroyukiVoiceResponse, error)
+	HiroyukiVoicies(ctx context.Context, obj *model.User, fields model.InputFields) ([]*model.HiroyukiVoiceResponse, error)
 }
 
 type executableSchema struct {
@@ -776,7 +776,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.User.HiroyukiVoicies(childComplexity, args["fields"].([]*model.InputFields)), true
+		return e.complexity.User.HiroyukiVoicies(childComplexity, args["fields"].(model.InputFields)), true
 
 	case "User.id":
 		if e.complexity.User.Id == nil {
@@ -1370,13 +1370,13 @@ func (ec *executionContext) field_User_hiroyukiVoicies_args(ctx context.Context,
 func (ec *executionContext) field_User_hiroyukiVoicies_argsFields(
 	ctx context.Context,
 	rawArgs map[string]any,
-) ([]*model.InputFields, error) {
+) (model.InputFields, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("fields"))
 	if tmp, ok := rawArgs["fields"]; ok {
-		return ec.unmarshalNInputFields2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFieldsᚄ(ctx, tmp)
+		return ec.unmarshalNInputFields2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFields(ctx, tmp)
 	}
 
-	var zeroVal []*model.InputFields
+	var zeroVal model.InputFields
 	return zeroVal, nil
 }
 
@@ -5266,7 +5266,7 @@ func (ec *executionContext) _User_hiroyukiVoicies(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().HiroyukiVoicies(rctx, obj, fc.Args["fields"].([]*model.InputFields))
+		return ec.resolvers.User().HiroyukiVoicies(rctx, obj, fc.Args["fields"].(model.InputFields))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9515,24 +9515,9 @@ func (ec *executionContext) unmarshalNInputExercise2githubᚗcomᚋmoXXchaᚋhir
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNInputFields2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFieldsᚄ(ctx context.Context, v any) ([]*model.InputFields, error) {
-	var vSlice []any
-	vSlice = graphql.CoerceList(v)
-	var err error
-	res := make([]*model.InputFields, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNInputFields2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFields(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalNInputFields2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFields(ctx context.Context, v any) (*model.InputFields, error) {
+func (ec *executionContext) unmarshalNInputFields2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFields(ctx context.Context, v any) (model.InputFields, error) {
 	res, err := ec.unmarshalInputInputFields(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNInputFood2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFoodᚄ(ctx context.Context, v any) ([]*model.InputFood, error) {
