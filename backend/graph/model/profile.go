@@ -103,3 +103,39 @@ func (*Profile) Create(input InputProfile, db *gorm.DB) (*UUID, error) {
 
 	return &profile.Id, nil
 }
+
+func (*Profile) Edit(input InputProfile, db *gorm.DB) (*UUID, error) {
+	var profile Profile
+
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	err := db.Where("user_id = ?", input.UserID).First(&profile).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, fmt.Errorf("profile not found")
+	}
+
+	profileInput := Profile{
+		UserName:                input.UserName,
+		UserId:                  input.UserID,
+		Age:                     input.Age,
+		Gender:                  utils.Gender(input.Gender),
+		Weight:                  input.Weight,
+		Height:                  input.Height,
+		TargetWeight:            input.TargetWeight,
+		TargetDailyCarorie:      input.TargetDailyCarorie,
+		TargetDailyExerciseTime: input.TargetDailyExerciseTime,
+		Favorability:            0,
+		IsCreated:               true,
+	}
+
+	err = db.Model(&Profile{}).Where("user_id = ?", input.UserID).Updates(&profileInput).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &profile.Id, nil
+}
