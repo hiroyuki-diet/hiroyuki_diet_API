@@ -98,7 +98,7 @@ type ComplexityRoot struct {
 		CreateExercise     func(childComplexity int, input model.InputExercise) int
 		CreateMeal         func(childComplexity int, input model.InputMeal) int
 		CreateProfile      func(childComplexity int, input model.InputProfile) int
-		Delete             func(childComplexity int, input model.UUID) int
+		DeleteMeal         func(childComplexity int, input model.UUID) int
 		EditExercise       func(childComplexity int, input model.InputExercise) int
 		EditMeal           func(childComplexity int, input model.InputMeal) int
 		EditProfile        func(childComplexity int, input model.InputProfile) int
@@ -181,7 +181,7 @@ type MutationResolver interface {
 	EditProfile(ctx context.Context, input model.InputProfile) (*model.UUID, error)
 	CreateMeal(ctx context.Context, input model.InputMeal) (*model.UUID, error)
 	EditMeal(ctx context.Context, input model.InputMeal) (*model.UUID, error)
-	Delete(ctx context.Context, input model.UUID) (*model.UUID, error)
+	DeleteMeal(ctx context.Context, input model.UUID) (*model.UUID, error)
 	PostSkin(ctx context.Context, input model.UUID) (*model.UUID, error)
 	UseItem(ctx context.Context, input model.UUID) (*model.UUID, error)
 }
@@ -431,17 +431,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.CreateProfile(childComplexity, args["input"].(model.InputProfile)), true
 
-	case "Mutation.delete":
-		if e.complexity.Mutation.Delete == nil {
+	case "Mutation.deleteMeal":
+		if e.complexity.Mutation.DeleteMeal == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_delete_args(ctx, rawArgs)
+		args, err := ec.field_Mutation_deleteMeal_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Delete(childComplexity, args["input"].(model.UUID)), true
+		return e.complexity.Mutation.DeleteMeal(childComplexity, args["input"].(model.UUID)), true
 
 	case "Mutation.editExercise":
 		if e.complexity.Mutation.EditExercise == nil {
@@ -1041,17 +1041,17 @@ func (ec *executionContext) field_Mutation_createProfile_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_delete_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_Mutation_deleteMeal_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_Mutation_delete_argsInput(ctx, rawArgs)
+	arg0, err := ec.field_Mutation_deleteMeal_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["input"] = arg0
 	return args, nil
 }
-func (ec *executionContext) field_Mutation_delete_argsInput(
+func (ec *executionContext) field_Mutation_deleteMeal_argsInput(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (model.UUID, error) {
@@ -3157,8 +3157,8 @@ func (ec *executionContext) fieldContext_Mutation_editMeal(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_delete(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_delete(ctx, field)
+func (ec *executionContext) _Mutation_deleteMeal(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteMeal(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3171,7 +3171,7 @@ func (ec *executionContext) _Mutation_delete(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Delete(rctx, fc.Args["input"].(model.UUID))
+		return ec.resolvers.Mutation().DeleteMeal(rctx, fc.Args["input"].(model.UUID))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3185,7 +3185,7 @@ func (ec *executionContext) _Mutation_delete(ctx context.Context, field graphql.
 	return ec.marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_delete(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_deleteMeal(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -3202,7 +3202,7 @@ func (ec *executionContext) fieldContext_Mutation_delete(ctx context.Context, fi
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_delete_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_deleteMeal_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -7987,9 +7987,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_editMeal(ctx, field)
 			})
-		case "delete":
+		case "deleteMeal":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_delete(ctx, field)
+				return ec._Mutation_deleteMeal(ctx, field)
 			})
 		case "postSkin":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
