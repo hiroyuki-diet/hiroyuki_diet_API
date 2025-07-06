@@ -94,6 +94,11 @@ func (r *mutationResolver) EditMeal(ctx context.Context, input model.InputMeal) 
 	return id, err
 }
 
+// Delete is the resolver for the delete field.
+func (r *mutationResolver) Delete(ctx context.Context, input model.UUID) (*model.UUID, error) {
+	panic(fmt.Errorf("not implemented: Delete - delete"))
+}
+
 // PostSkin is the resolver for the postSkin field.
 func (r *mutationResolver) PostSkin(ctx context.Context, input model.UUID) (*model.UUID, error) {
 	panic(fmt.Errorf("not implemented: PostSkin - postSkin"))

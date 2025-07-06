@@ -50,6 +50,7 @@ type Mutation {
   editProfile(input: InputProfile!): ID
   createMeal(input: InputMeal!): ID
   editMeal(input: InputMeal!): ID
+  delete(input: ID!): ID
   postSkin(input: ID!): ID
   useItem(input: ID!): ID
 }
