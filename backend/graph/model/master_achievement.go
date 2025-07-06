@@ -60,3 +60,28 @@ func (*MasterAchievement) GetAchievement(id UUID, db *gorm.DB) ([]*AchievementRe
 
 	return achievements, err
 }
+
+func (*MasterAchievement) Receipt(input InputAchievement, db *gorm.DB) (*UUID, error) {
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	var userAchievement UserAchievement
+	err := db.Where("user_id = ?", input.UserID).Where("achievement_id = ?", input.AchievementID).First(&userAchievement).Error
+
+	if err == nil {
+		return nil, fmt.Errorf("allready receipt")
+	}
+
+	achievement := UserAchievement{
+		UserId:        input.UserID,
+		AchievementId: input.AchievementID,
+	}
+	err = db.Model(&UserAchievement{}).Create(&achievement).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &achievement.Id, nil
+}
