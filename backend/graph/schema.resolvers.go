@@ -158,7 +158,10 @@ func (r *userResolver) Achievements(ctx context.Context, obj *model.User) ([]*mo
 
 // HiroyukiVoicies is the resolver for the hiroyukiVoicies field.
 func (r *userResolver) HiroyukiVoicies(ctx context.Context, obj *model.User, fields []utils.Field) ([]*model.HiroyukiVoiceResponse, error) {
-	panic(fmt.Errorf("not implemented: HiroyukiVoicies - hiroyukiVoicies"))
+	db := r.DB
+	voiceModel := model.MasterHiroyukiVoice{}
+	voices, err := voiceModel.GetVoices(obj.Id, fields, db)
+	return voices, err
 }
 
 // Exercise returns ExerciseResolver implementation.

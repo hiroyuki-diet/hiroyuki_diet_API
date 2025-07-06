@@ -309,7 +309,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.HiroyukiVoiceResponse.IsHaving(childComplexity), true
 
-	case "HiroyukiVoiceResponse.Name":
+	case "HiroyukiVoiceResponse.name":
 		if e.complexity.HiroyukiVoiceResponse.Name == nil {
 			break
 		}
@@ -1976,8 +1976,8 @@ func (ec *executionContext) fieldContext_HiroyukiVoiceResponse_id(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _HiroyukiVoiceResponse_Name(ctx context.Context, field graphql.CollectedField, obj *model.HiroyukiVoiceResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_HiroyukiVoiceResponse_Name(ctx, field)
+func (ec *executionContext) _HiroyukiVoiceResponse_name(ctx context.Context, field graphql.CollectedField, obj *model.HiroyukiVoiceResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_HiroyukiVoiceResponse_name(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2007,7 +2007,7 @@ func (ec *executionContext) _HiroyukiVoiceResponse_Name(ctx context.Context, fie
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_HiroyukiVoiceResponse_Name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_HiroyukiVoiceResponse_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "HiroyukiVoiceResponse",
 		Field:      field,
@@ -5232,8 +5232,8 @@ func (ec *executionContext) fieldContext_User_hiroyukiVoicies(ctx context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_HiroyukiVoiceResponse_id(ctx, field)
-			case "Name":
-				return ec.fieldContext_HiroyukiVoiceResponse_Name(ctx, field)
+			case "name":
+				return ec.fieldContext_HiroyukiVoiceResponse_name(ctx, field)
 			case "voiceUrl":
 				return ec.fieldContext_HiroyukiVoiceResponse_voiceUrl(ctx, field)
 			case "releaseLevel":
@@ -7791,8 +7791,8 @@ func (ec *executionContext) _HiroyukiVoiceResponse(ctx context.Context, sel ast.
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "Name":
-			out.Values[i] = ec._HiroyukiVoiceResponse_Name(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._HiroyukiVoiceResponse_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

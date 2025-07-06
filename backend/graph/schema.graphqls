@@ -2,20 +2,20 @@
 #
 # https://gqlgen.com/getting-started/
 enum FieldEnum {
-  LOGIN
-  SIGNIN
-  HOME
-  MEAL
-  MEAL_FORM
-  MEAL_EDIT
-  DATA
-  PROFILE
-  PROFILE_EDIT
-  EXERCISE
-  EEXERCISE_COMPLETE
-  ACHIEVEMENT
-  ACHIEVEMENT_COMPLETE
-  CHIBI_HIROYUKI
+  login
+  signin
+  home
+  meal
+  meal_form
+  meal_edit
+  data
+  profile
+  profile_edit
+  exercise
+  eexercise_complete
+  achievement
+  achievement_complete
+  chibi_hiroyuki
 }
 enum SkinPartEnum {
   HEAD
@@ -117,7 +117,7 @@ type User {
 
 type HiroyukiVoiceResponse {
   id: ID!
-  Name: String!
+  name: String!
   voiceUrl: String!
   releaseLevel: Int!
   fields: [FieldEnum!]!
