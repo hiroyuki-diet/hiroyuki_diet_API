@@ -18,21 +18,21 @@ enum FieldEnum {
   chibi_hiroyuki
 }
 enum SkinPartEnum {
-  HEAD
-  FACE
-  BODY
+  head
+  face
+  body
 }
 
 enum MealTypeEnum {
-  BREAKFAST
-  LUNCH
-  DINNER
-  SNACKING
+  breakfast
+  lunch
+  dinner
+  snacking
 }
 
 enum GenderEnum {
-  MAN
-  WOMAN
+  man
+  woman
 }
 type Query {
   user(id: ID!): User!
