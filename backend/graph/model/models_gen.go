@@ -11,18 +11,9 @@ type Auth struct {
 	Password string `json:"password"`
 }
 
-type FieldInput struct {
-	ID    UUID        `json:"id"`
-	Field utils.Field `json:"field"`
-}
-
 type InputExercise struct {
-	ID   *UUID `json:"id,omitempty"`
-	Time int   `json:"time"`
-}
-
-type InputFields struct {
-	Fields []*FieldInput `json:"fields"`
+	UserID *UUID `json:"userId,omitempty"`
+	Time   int   `json:"time"`
 }
 
 type InputFood struct {
@@ -33,13 +24,13 @@ type InputFood struct {
 }
 
 type InputMeal struct {
-	ID       *UUID          `json:"id,omitempty"`
+	UserID   *UUID          `json:"userId,omitempty"`
 	MealType utils.MealType `json:"mealType"`
 	Foods    []*InputFood   `json:"foods"`
 }
 
 type InputProfile struct {
-	ID                      *UUID   `json:"id,omitempty"`
+	UserID                  *UUID   `json:"userId,omitempty"`
 	Name                    string  `json:"name"`
 	Description             *string `json:"description,omitempty"`
 	Age                     int     `json:"age"`
@@ -58,6 +49,6 @@ type Query struct {
 }
 
 type UseItem struct {
-	ID    UUID `json:"id"`
-	Count int  `json:"count"`
+	ItemID UUID `json:"itemId"`
+	Count  int  `json:"count"`
 }
