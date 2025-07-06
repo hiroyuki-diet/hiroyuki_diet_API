@@ -69,3 +69,31 @@ func (*Exercise) GetInfo(id UUID, offset string, limit string, db *gorm.DB) ([]*
 
 	return exercises, nil
 }
+
+func (*Exercise) Create(input InputExercise, db *gorm.DB) (*UUID, error) {
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+	todayStr := time.Now().Format("2006-01-02")
+
+	layout := "2006-01-02"
+
+	t, err := time.Parse(layout, todayStr)
+	if err != nil {
+		return nil, err
+	}
+
+	exercise := Exercise{
+		UserId: *input.UserID,
+		Time:   input.Time,
+		Date:   t,
+	}
+
+	err = db.Create(&exercise).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &exercise.Id, nil
+}

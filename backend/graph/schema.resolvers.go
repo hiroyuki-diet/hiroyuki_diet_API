@@ -24,62 +24,65 @@ func (r *foodResolver) LastUsedDate(ctx context.Context, obj *model.Food) (strin
 }
 
 // SignUp is the resolver for the signUp field.
-func (r *mutationResolver) SignUp(ctx context.Context, input model.Auth) (string, error) {
+func (r *mutationResolver) SignUp(ctx context.Context, input model.Auth) (*string, error) {
 	panic(fmt.Errorf("not implemented: SignUp - signUp"))
 }
 
 // Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, input model.Auth) (string, error) {
+func (r *mutationResolver) Login(ctx context.Context, input model.Auth) (*string, error) {
 	panic(fmt.Errorf("not implemented: Login - login"))
 }
 
 // Logout is the resolver for the logout field.
-func (r *mutationResolver) Logout(ctx context.Context, input model.UUID) (model.UUID, error) {
+func (r *mutationResolver) Logout(ctx context.Context, input model.UUID) (*model.UUID, error) {
 	panic(fmt.Errorf("not implemented: Logout - logout"))
 }
 
 // CreateExercise is the resolver for the createExercise field.
-func (r *mutationResolver) CreateExercise(ctx context.Context, input model.InputExercise) (model.UUID, error) {
-	panic(fmt.Errorf("not implemented: CreateExercise - createExercise"))
+func (r *mutationResolver) CreateExercise(ctx context.Context, input model.InputExercise) (*model.UUID, error) {
+	db := r.DB
+	exerciseModel := model.Exercise{}
+	id, err := exerciseModel.Create(input, db)
+	return id, err
 }
 
 // EditExercise is the resolver for the editExercise field.
-func (r *mutationResolver) EditExercise(ctx context.Context, input model.InputExercise) (model.UUID, error) {
+func (r *mutationResolver) EditExercise(ctx context.Context, input model.InputExercise) (*model.UUID, error) {
 	panic(fmt.Errorf("not implemented: EditExercise - editExercise"))
 }
 
 // ReceiptAchievement is the resolver for the receiptAchievement field.
-func (r *mutationResolver) ReceiptAchievement(ctx context.Context, input model.UUID) (model.UUID, error) {
+func (r *mutationResolver) ReceiptAchievement(ctx context.Context, input model.UUID) (*model.UUID, error) {
 	panic(fmt.Errorf("not implemented: ReceiptAchievement - receiptAchievement"))
 }
 
 // CreateProfile is the resolver for the createProfile field.
-func (r *mutationResolver) CreateProfile(ctx context.Context, input model.InputProfile) (model.UUID, error) {
+func (r *mutationResolver) CreateProfile(ctx context.Context, input model.InputProfile) (*model.UUID, error) {
 	panic(fmt.Errorf("not implemented: CreateProfile - createProfile"))
 }
 
 // EditProfile is the resolver for the editProfile field.
-func (r *mutationResolver) EditProfile(ctx context.Context, input model.InputProfile) (model.UUID, error) {
+func (r *mutationResolver) EditProfile(ctx context.Context, input model.InputProfile) (*model.UUID, error) {
 	panic(fmt.Errorf("not implemented: EditProfile - editProfile"))
 }
 
 // CreateMeal is the resolver for the createMeal field.
-func (r *mutationResolver) CreateMeal(ctx context.Context, input model.InputMeal) (model.UUID, error) {
+func (r *mutationResolver) CreateMeal(ctx context.Context, input model.InputMeal) (*model.UUID, error) {
 	panic(fmt.Errorf("not implemented: CreateMeal - createMeal"))
 }
 
 // EditMeal is the resolver for the editMeal field.
-func (r *mutationResolver) EditMeal(ctx context.Context, input model.InputMeal) (model.UUID, error) {
+func (r *mutationResolver) EditMeal(ctx context.Context, input model.InputMeal) (*model.UUID, error) {
 	panic(fmt.Errorf("not implemented: EditMeal - editMeal"))
 }
 
 // PostSkin is the resolver for the postSkin field.
-func (r *mutationResolver) PostSkin(ctx context.Context, input model.UUID) (model.UUID, error) {
+func (r *mutationResolver) PostSkin(ctx context.Context, input model.UUID) (*model.UUID, error) {
 	panic(fmt.Errorf("not implemented: PostSkin - postSkin"))
 }
 
 // UseItem is the resolver for the useItem field.
-func (r *mutationResolver) UseItem(ctx context.Context, input model.UUID) (model.UUID, error) {
+func (r *mutationResolver) UseItem(ctx context.Context, input model.UUID) (*model.UUID, error) {
 	panic(fmt.Errorf("not implemented: UseItem - useItem"))
 }
 
