@@ -21,17 +21,10 @@ type InputExercise struct {
 	Time   int   `json:"time"`
 }
 
-type InputFood struct {
-	ID              UUID   `json:"id"`
-	Name            string `json:"name"`
-	EstimateCalorie int    `json:"estimateCalorie"`
-	LastUsedDate    string `json:"lastUsedDate"`
-}
-
 type InputMeal struct {
 	UserID   *UUID          `json:"userId,omitempty"`
 	MealType utils.MealType `json:"mealType"`
-	Foods    []*InputFood   `json:"foods"`
+	Foods    []UUID         `json:"foods"`
 }
 
 type InputProfile struct {

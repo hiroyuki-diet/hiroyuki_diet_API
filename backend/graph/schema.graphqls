@@ -18,21 +18,21 @@ enum FieldEnum {
   chibi_hiroyuki
 }
 enum SkinPartEnum {
-  HEAD
-  FACE
-  BODY
+  head
+  face
+  body
 }
 
 enum MealTypeEnum {
-  BREAKFAST
-  LUNCH
-  DINNER
-  SNACKING
+  breakfast
+  lunch
+  dinner
+  snacking
 }
 
 enum GenderEnum {
-  MAN
-  WOMAN
+  man
+  woman
 }
 type Query {
   user(id: ID!): User!
@@ -85,14 +85,7 @@ input InputProfile {
 input InputMeal {
   userId: ID
   mealType: MealTypeEnum!
-  foods: [InputFood!]!
-}
-
-input InputFood {
-  id: ID! #これなんのIDだ？
-  name: String!
-  estimateCalorie: Int!
-  lastUsedDate: String!
+  foods: [ID!]!
 }
 
 type User {

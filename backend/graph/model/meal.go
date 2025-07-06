@@ -53,6 +53,54 @@ func (*Meal) GetById(id UUID, db *gorm.DB) (*Meal, error) {
 	return meal, nil
 }
 
+func (*Meal) Create(input InputMeal, db *gorm.DB) (*UUID, error) {
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	var foods []Food
+
+	err := db.Where("id IN ?", input.Foods).Find(&foods).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	totalCalorie := 0
+	for _, food := range foods {
+		totalCalorie += food.EstimateCalorie
+	}
+
+	mealInput := Meal{
+		UserId:       *input.UserID,
+		MealType:     input.MealType,
+		TotalCalorie: totalCalorie,
+		Foods:        foods,
+	}
+
+	err = db.Create(&mealInput).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	todayStr := time.Now().Format("2006-01-02")
+	layout := "2006-01-02"
+
+	t, err := time.Parse(layout, todayStr)
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Model(&Food{}).Where("id IN ?", input.Foods).Update("last_used_date", t).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &mealInput.Id, nil
+}
+
 func (*Meal) Seeder(db *gorm.DB) error {
 	var count int64
 

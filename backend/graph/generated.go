@@ -839,7 +839,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputAuth,
 		ec.unmarshalInputInputAchievement,
 		ec.unmarshalInputInputExercise,
-		ec.unmarshalInputInputFood,
 		ec.unmarshalInputInputMeal,
 		ec.unmarshalInputInputProfile,
 		ec.unmarshalInputUseItem,
@@ -7276,54 +7275,6 @@ func (ec *executionContext) unmarshalInputInputExercise(ctx context.Context, obj
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputInputFood(ctx context.Context, obj any) (model.InputFood, error) {
-	var it model.InputFood
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"id", "name", "estimateCalorie", "lastUsedDate"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "id":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			data, err := ec.unmarshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ID = data
-		case "name":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Name = data
-		case "estimateCalorie":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("estimateCalorie"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.EstimateCalorie = data
-		case "lastUsedDate":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lastUsedDate"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.LastUsedDate = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputInputMeal(ctx context.Context, obj any) (model.InputMeal, error) {
 	var it model.InputMeal
 	asMap := map[string]any{}
@@ -7354,7 +7305,7 @@ func (ec *executionContext) unmarshalInputInputMeal(ctx context.Context, obj any
 			it.MealType = data
 		case "foods":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("foods"))
-			data, err := ec.unmarshalNInputFood2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFoodᚄ(ctx, v)
+			data, err := ec.unmarshalNID2ᚕgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUIDᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9296,6 +9247,36 @@ func (ec *executionContext) marshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_AP
 	return v
 }
 
+func (ec *executionContext) unmarshalNID2ᚕgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUIDᚄ(ctx context.Context, v any) ([]model.UUID, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]model.UUID, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNID2ᚕgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUIDᚄ(ctx context.Context, sel ast.SelectionSet, v []model.UUID) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
 func (ec *executionContext) unmarshalNInputAchievement2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputAchievement(ctx context.Context, v any) (model.InputAchievement, error) {
 	res, err := ec.unmarshalInputInputAchievement(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -9304,26 +9285,6 @@ func (ec *executionContext) unmarshalNInputAchievement2githubᚗcomᚋmoXXchaᚋ
 func (ec *executionContext) unmarshalNInputExercise2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputExercise(ctx context.Context, v any) (model.InputExercise, error) {
 	res, err := ec.unmarshalInputInputExercise(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNInputFood2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFoodᚄ(ctx context.Context, v any) ([]*model.InputFood, error) {
-	var vSlice []any
-	vSlice = graphql.CoerceList(v)
-	var err error
-	res := make([]*model.InputFood, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNInputFood2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFood(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalNInputFood2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputFood(ctx context.Context, v any) (*model.InputFood, error) {
-	res, err := ec.unmarshalInputInputFood(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNInputMeal2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputMeal(ctx context.Context, v any) (model.InputMeal, error) {

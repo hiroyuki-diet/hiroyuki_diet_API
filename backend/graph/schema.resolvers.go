@@ -80,7 +80,10 @@ func (r *mutationResolver) EditProfile(ctx context.Context, input model.InputPro
 
 // CreateMeal is the resolver for the createMeal field.
 func (r *mutationResolver) CreateMeal(ctx context.Context, input model.InputMeal) (*model.UUID, error) {
-	panic(fmt.Errorf("not implemented: CreateMeal - createMeal"))
+	db := r.DB
+	mealModel := model.Meal{}
+	id, err := mealModel.Create(input, db)
+	return id, err
 }
 
 // EditMeal is the resolver for the editMeal field.
