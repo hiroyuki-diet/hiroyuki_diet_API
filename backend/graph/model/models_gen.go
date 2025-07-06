@@ -35,16 +35,15 @@ type InputMeal struct {
 }
 
 type InputProfile struct {
-	UserID                  *UUID   `json:"userId,omitempty"`
-	Name                    string  `json:"name"`
-	Description             *string `json:"description,omitempty"`
-	Age                     int     `json:"age"`
-	Gender                  string  `json:"gender"`
-	Weight                  int     `json:"weight"`
-	Height                  int     `json:"height"`
-	TargetWeight            int     `json:"targetWeight"`
-	TargetDailyExerciseTime int     `json:"targetDailyExerciseTime"`
-	TargetDailyCarorie      int     `json:"targetDailyCarorie"`
+	UserID                  UUID   `json:"userId"`
+	UserName                string `json:"userName"`
+	Age                     int    `json:"age"`
+	Gender                  string `json:"gender"`
+	Weight                  int    `json:"weight"`
+	Height                  int    `json:"height"`
+	TargetWeight            int    `json:"targetWeight"`
+	TargetDailyExerciseTime int    `json:"targetDailyExerciseTime"`
+	TargetDailyCarorie      int    `json:"targetDailyCarorie"`
 }
 
 type Mutation struct {

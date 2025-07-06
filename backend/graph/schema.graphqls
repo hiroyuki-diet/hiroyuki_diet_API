@@ -72,9 +72,8 @@ input InputExercise {
   time: Int!
 }
 input InputProfile {
-  userId: ID
-  name: String!
-  description: String
+  userId: ID!
+  userName: String!
   age: Int!
   gender: String!
   weight: Int!
