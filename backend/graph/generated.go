@@ -7282,7 +7282,7 @@ func (ec *executionContext) unmarshalInputInputMeal(ctx context.Context, obj any
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"userId", "mealType", "foods"}
+	fieldsInOrder := [...]string{"userId", "mealId", "mealType", "foods"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7296,6 +7296,13 @@ func (ec *executionContext) unmarshalInputInputMeal(ctx context.Context, obj any
 				return it, err
 			}
 			it.UserID = data
+		case "mealId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mealId"))
+			data, err := ec.unmarshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MealID = data
 		case "mealType":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mealType"))
 			data, err := ec.unmarshalNMealTypeEnum2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋutilsᚐMealType(ctx, v)

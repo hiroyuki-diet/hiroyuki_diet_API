@@ -101,6 +101,60 @@ func (*Meal) Create(input InputMeal, db *gorm.DB) (*UUID, error) {
 	return &mealInput.Id, nil
 }
 
+func (*Meal) Edit(input InputMeal, db *gorm.DB) (*UUID, error) {
+	var foods []Food
+
+	err := db.Where("id IN ?", input.Foods).Find(&foods).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	totalCalorie := 0
+	for _, food := range foods {
+		totalCalorie += food.EstimateCalorie
+	}
+
+	var meal Meal
+	err = db.Where("id = ?", input.MealID).First(&meal).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	mealInput := Meal{
+		MealType:     input.MealType,
+		TotalCalorie: totalCalorie,
+	}
+
+	err = db.Where("id = ?", input.MealID).Updates(&mealInput).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Model(&meal).Association("Foods").Replace(foods)
+	if err != nil {
+		return nil, err
+	}
+
+	todayStr := time.Now().Format("2006-01-02")
+	layout := "2006-01-02"
+
+	t, err := time.Parse(layout, todayStr)
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Model(&Food{}).Where("id IN ?", input.Foods).Update("last_used_date", t).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &meal.Id, nil
+}
+
 func (*Meal) Seeder(db *gorm.DB) error {
 	var count int64
 

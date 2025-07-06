@@ -84,6 +84,7 @@ input InputProfile {
 }
 input InputMeal {
   userId: ID
+  mealId: ID
   mealType: MealTypeEnum!
   foods: [ID!]!
 }
