@@ -7372,7 +7372,7 @@ func (ec *executionContext) unmarshalInputInputProfile(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"userId", "name", "description", "age", "gender", "weight", "height", "targetWeight", "targetDailyExerciseTime", "targetDailyCarorie"}
+	fieldsInOrder := [...]string{"userId", "userName", "age", "gender", "weight", "height", "targetWeight", "targetDailyExerciseTime", "targetDailyCarorie"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7381,25 +7381,18 @@ func (ec *executionContext) unmarshalInputInputProfile(ctx context.Context, obj 
 		switch k {
 		case "userId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
-			data, err := ec.unmarshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, v)
+			data, err := ec.unmarshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.UserID = data
-		case "name":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+		case "userName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userName"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Name = data
-		case "description":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Description = data
+			it.UserName = data
 		case "age":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("age"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
