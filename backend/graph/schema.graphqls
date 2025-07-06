@@ -85,14 +85,7 @@ input InputProfile {
 input InputMeal {
   userId: ID
   mealType: MealTypeEnum!
-  foods: [InputFood!]!
-}
-
-input InputFood {
-  id: ID! #これなんのIDだ？
-  name: String!
-  estimateCalorie: Int!
-  lastUsedDate: String!
+  foods: [ID!]!
 }
 
 type User {
