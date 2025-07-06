@@ -45,7 +45,7 @@ type Mutation {
   logout(input: ID!): ID
   createExercise(input: InputExercise!): ID
   editExercise(input: InputExercise!): ID
-  receiptAchievement(input: ID!): ID
+  receiptAchievement(input: InputAchievement!): ID
   createProfile(input: InputProfile!): ID
   editProfile(input: InputProfile!): ID
   createMeal(input: InputMeal!): ID
@@ -56,6 +56,11 @@ type Mutation {
 input UseItem {
   itemId: ID!
   count: Int!
+}
+
+input InputAchievement {
+  userId: ID!
+  achievementId: ID!
 }
 
 input Auth {

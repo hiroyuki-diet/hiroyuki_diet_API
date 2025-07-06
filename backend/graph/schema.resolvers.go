@@ -55,8 +55,11 @@ func (r *mutationResolver) EditExercise(ctx context.Context, input model.InputEx
 }
 
 // ReceiptAchievement is the resolver for the receiptAchievement field.
-func (r *mutationResolver) ReceiptAchievement(ctx context.Context, input model.UUID) (*model.UUID, error) {
-	panic(fmt.Errorf("not implemented: ReceiptAchievement - receiptAchievement"))
+func (r *mutationResolver) ReceiptAchievement(ctx context.Context, input model.InputAchievement) (*model.UUID, error) {
+	db := r.DB
+	achievementModel := model.MasterAchievement{}
+	id, err := achievementModel.Receipt(input, db)
+	return id, err
 }
 
 // CreateProfile is the resolver for the createProfile field.
@@ -190,3 +193,20 @@ type foodResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *achievementResolver) UserID(ctx context.Context, obj *model.MasterAchievement, data model.UUID) error {
+	panic(fmt.Errorf("not implemented: UserID - userId"))
+}
+func (r *achievementResolver) AchievementID(ctx context.Context, obj *model.MasterAchievement, data model.UUID) error {
+	panic(fmt.Errorf("not implemented: AchievementID - achievementId"))
+}
+func (r *Resolver) Achievement() AchievementResolver { return &achievementResolver{r} }
+type achievementResolver struct{ *Resolver }
+*/

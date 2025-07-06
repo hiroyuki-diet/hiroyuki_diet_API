@@ -11,6 +11,11 @@ type Auth struct {
 	Password string `json:"password"`
 }
 
+type InputAchievement struct {
+	UserID        UUID `json:"userId"`
+	AchievementID UUID `json:"achievementId"`
+}
+
 type InputExercise struct {
 	UserID *UUID `json:"userId,omitempty"`
 	Time   int   `json:"time"`
