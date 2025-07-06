@@ -10,10 +10,10 @@ import (
 
 type Exercise struct {
 	Id        UUID           `gorm:"primary_key; type: uuid; not null; default:uuid_generate_v4()"`
-	UserId    UUID           `gorm:"type: uuid; not null"`
+	UserId    UUID           `gorm:"type: uuid; uniqueIndex:idx_user_date; not null"`
 	User      User           `gorm:"foreignKey:UserId;references:Id"`
 	Time      int            `gorm:"type: int; not null"`
-	Date      time.Time      `gorm:"type: date; not null; default:CURRENT_TIMESTAMP;<-:create"`
+	Date      time.Time      `gorm:"type: date; uniqueIndex:idx_user_date; not null; default:CURRENT_TIMESTAMP;<-:create"`
 	CreatedAt time.Time      `gorm:"type: timestamp; autoCreateTime; not null; default:CURRENT_TIMESTAMP;<-:create"`
 	UpdatedAt time.Time      `gorm:"type: timestamp; autoUpdateTime;<-:update"`
 	DeletedAt gorm.DeletedAt `gorm:"type: timestamp; index"`
@@ -96,4 +96,50 @@ func (*Exercise) Create(input InputExercise, db *gorm.DB) (*UUID, error) {
 	}
 
 	return &exercise.Id, nil
+}
+
+func (*Exercise) Edit(input InputExercise, db *gorm.DB) (*UUID, error) {
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	todayStr := time.Now().Format("2006-01-02")
+	layout := "2006-01-02"
+
+	t, err := time.Parse(layout, todayStr)
+	if err != nil {
+		return nil, err
+	}
+
+	exerciseInput := Exercise{
+		Time: input.Time,
+	}
+
+	var exercise Exercise
+
+	err = db.Model(&Exercise{}).
+		Where("user_id = ?", input.UserID).
+		Where("date = ?", t).First(&exercise).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Model(&Exercise{}).
+		Where("user_id = ?", input.UserID).
+		Where("date = ?", t).
+		Updates(exerciseInput).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Where("user_id = ?", input.UserID).Where("date = ?", t).First(&exercise).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &exercise.Id, nil
+
 }

@@ -48,7 +48,10 @@ func (r *mutationResolver) CreateExercise(ctx context.Context, input model.Input
 
 // EditExercise is the resolver for the editExercise field.
 func (r *mutationResolver) EditExercise(ctx context.Context, input model.InputExercise) (*model.UUID, error) {
-	panic(fmt.Errorf("not implemented: EditExercise - editExercise"))
+	db := r.DB
+	exerciseModel := model.Exercise{}
+	id, err := exerciseModel.Edit(input, db)
+	return id, err
 }
 
 // ReceiptAchievement is the resolver for the receiptAchievement field.
