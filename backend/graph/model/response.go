@@ -26,3 +26,12 @@ type AchievementResponse struct {
 	Name    string
 	IsClear bool
 }
+
+type HiroyukiVoiceResponse struct {
+	Id           UUID
+	Name         string
+	VoiceUrl     string
+	ReleaseLevel int
+	Fields       []utils.Field
+	IsHaving     bool
+}

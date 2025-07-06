@@ -16,14 +16,6 @@ type FieldInput struct {
 	Field utils.Field `json:"field"`
 }
 
-type HiroyukiVoice struct {
-	ID           UUID           `json:"id"`
-	VoiceURL     string         `json:"voiceUrl"`
-	ReleaseLevel int            `json:"releaseLevel"`
-	Fields       []*MasterField `json:"fields"`
-	IsHaving     bool           `json:"isHaving"`
-}
-
 type InputExercise struct {
 	ID   *UUID `json:"id,omitempty"`
 	Time int   `json:"time"`

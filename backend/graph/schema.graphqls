@@ -2,20 +2,20 @@
 #
 # https://gqlgen.com/getting-started/
 enum FieldEnum {
-  LOGIN
-  SIGNIN
-  HOME
-  MEAL
-  MEAL_FORM
-  MEAL_EDIT
-  DATA
-  PROFILE
-  PROFILE_EDIT
-  EXERCISE
-  EEXERCISE_COMPLETE
-  ACHIEVEMENT
-  ACHIEVEMENT_COMPLETE
-  CHIBI_HIROYUKI
+  login
+  signin
+  home
+  meal
+  meal_form
+  meal_edit
+  data
+  profile
+  profile_edit
+  exercise
+  eexercise_complete
+  achievement
+  achievement_complete
+  chibi_hiroyuki
 }
 enum SkinPartEnum {
   HEAD
@@ -112,21 +112,17 @@ type User {
   items: [ItemResponse!]
   hiroyukiSkins(usingSkin: Boolean!): [SkinResponse!]!
   achievements: [AchievementResponse!]!
-  hiroyukiVoicies(fields: [InputFields!]!): [HiroyukiVoice!]!
+  hiroyukiVoicies(fields: [FieldEnum!]!): [HiroyukiVoiceResponse!]!
 }
 
-type HiroyukiVoice {
+type HiroyukiVoiceResponse {
   id: ID!
+  name: String!
   voiceUrl: String!
   releaseLevel: Int!
-  fields: [Field!]!
+  fields: [FieldEnum!]!
   isHaving: Boolean!
 }
-type Field {
-  id: ID!
-  field: FieldEnum!
-}
-
 type AchievementResponse {
   id: ID!
   name: String!
