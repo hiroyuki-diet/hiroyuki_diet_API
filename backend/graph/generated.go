@@ -104,7 +104,7 @@ type ComplexityRoot struct {
 		Login              func(childComplexity int, input model.Auth) int
 		Logout             func(childComplexity int, input model.UUID) int
 		PostSkin           func(childComplexity int, input model.UUID) int
-		ReceiptAchievement func(childComplexity int, input model.UUID) int
+		ReceiptAchievement func(childComplexity int, input model.InputAchievement) int
 		SignUp             func(childComplexity int, input model.Auth) int
 		UseItem            func(childComplexity int, input model.UUID) int
 	}
@@ -175,7 +175,7 @@ type MutationResolver interface {
 	Logout(ctx context.Context, input model.UUID) (*model.UUID, error)
 	CreateExercise(ctx context.Context, input model.InputExercise) (*model.UUID, error)
 	EditExercise(ctx context.Context, input model.InputExercise) (*model.UUID, error)
-	ReceiptAchievement(ctx context.Context, input model.UUID) (*model.UUID, error)
+	ReceiptAchievement(ctx context.Context, input model.InputAchievement) (*model.UUID, error)
 	CreateProfile(ctx context.Context, input model.InputProfile) (*model.UUID, error)
 	EditProfile(ctx context.Context, input model.InputProfile) (*model.UUID, error)
 	CreateMeal(ctx context.Context, input model.InputMeal) (*model.UUID, error)
@@ -511,7 +511,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Mutation.ReceiptAchievement(childComplexity, args["input"].(model.UUID)), true
+		return e.complexity.Mutation.ReceiptAchievement(childComplexity, args["input"].(model.InputAchievement)), true
 
 	case "Mutation.signUp":
 		if e.complexity.Mutation.SignUp == nil {
@@ -837,6 +837,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAuth,
+		ec.unmarshalInputInputAchievement,
 		ec.unmarshalInputInputExercise,
 		ec.unmarshalInputInputFood,
 		ec.unmarshalInputInputMeal,
@@ -1178,13 +1179,13 @@ func (ec *executionContext) field_Mutation_receiptAchievement_args(ctx context.C
 func (ec *executionContext) field_Mutation_receiptAchievement_argsInput(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (model.UUID, error) {
+) (model.InputAchievement, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, tmp)
+		return ec.unmarshalNInputAchievement2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputAchievement(ctx, tmp)
 	}
 
-	var zeroVal model.UUID
+	var zeroVal model.InputAchievement
 	return zeroVal, nil
 }
 
@@ -2874,7 +2875,7 @@ func (ec *executionContext) _Mutation_receiptAchievement(ctx context.Context, fi
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ReceiptAchievement(rctx, fc.Args["input"].(model.UUID))
+		return ec.resolvers.Mutation().ReceiptAchievement(rctx, fc.Args["input"].(model.InputAchievement))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7207,6 +7208,40 @@ func (ec *executionContext) unmarshalInputAuth(ctx context.Context, obj any) (mo
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputInputAchievement(ctx context.Context, obj any) (model.InputAchievement, error) {
+	var it model.InputAchievement
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"userId", "achievementId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "userId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserID = data
+		case "achievementId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("achievementId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AchievementID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputInputExercise(ctx context.Context, obj any) (model.InputExercise, error) {
 	var it model.InputExercise
 	asMap := map[string]any{}
@@ -9266,6 +9301,11 @@ func (ec *executionContext) unmarshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_
 
 func (ec *executionContext) marshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx context.Context, sel ast.SelectionSet, v model.UUID) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) unmarshalNInputAchievement2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputAchievement(ctx context.Context, v any) (model.InputAchievement, error) {
+	res, err := ec.unmarshalInputInputAchievement(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNInputExercise2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputExercise(ctx context.Context, v any) (model.InputExercise, error) {
