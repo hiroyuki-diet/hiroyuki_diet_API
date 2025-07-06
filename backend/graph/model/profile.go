@@ -75,3 +75,31 @@ func (*Profile) Seeder(db *gorm.DB) error {
 
 	return nil
 }
+
+func (*Profile) Create(input InputProfile, db *gorm.DB) (*UUID, error) {
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	profile := Profile{
+		UserName:                input.UserName,
+		UserId:                  input.UserID,
+		Age:                     input.Age,
+		Gender:                  utils.Gender(input.Gender),
+		Weight:                  input.Weight,
+		Height:                  input.Height,
+		TargetWeight:            input.TargetWeight,
+		TargetDailyCarorie:      input.TargetDailyCarorie,
+		TargetDailyExerciseTime: input.TargetDailyExerciseTime,
+		Favorability:            0,
+		IsCreated:               true,
+	}
+
+	err := db.Create(&profile).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &profile.Id, nil
+}
