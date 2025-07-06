@@ -23,6 +23,7 @@ type InputExercise struct {
 
 type InputMeal struct {
 	UserID   *UUID          `json:"userId,omitempty"`
+	MealID   *UUID          `json:"mealId,omitempty"`
 	MealType utils.MealType `json:"mealType"`
 	Foods    []UUID         `json:"foods"`
 }
