@@ -40,21 +40,21 @@ type Query {
 }
 
 type Mutation {
-  signUp(input: Auth!): String!
-  login(input: Auth!): String!
-  logout(input: ID!): ID!
-  createExercise(input: InputExercise!): ID!
-  editExercise(input: InputExercise!): ID!
-  receiptAchievement(input: ID!): ID!
-  createProfile(input: InputProfile!): ID!
-  editProfile(input: InputProfile!): ID!
-  createMeal(input: InputMeal!): ID!
-  editMeal(input: InputMeal!): ID!
-  postSkin(input: ID!): ID!
-  useItem(input: ID!): ID!
+  signUp(input: Auth!): String
+  login(input: Auth!): String
+  logout(input: ID!): ID
+  createExercise(input: InputExercise!): ID
+  editExercise(input: InputExercise!): ID
+  receiptAchievement(input: ID!): ID
+  createProfile(input: InputProfile!): ID
+  editProfile(input: InputProfile!): ID
+  createMeal(input: InputMeal!): ID
+  editMeal(input: InputMeal!): ID
+  postSkin(input: ID!): ID
+  useItem(input: ID!): ID
 }
 input UseItem {
-  id: ID!
+  itemId: ID!
   count: Int!
 }
 
@@ -63,11 +63,11 @@ input Auth {
   password: String!
 }
 input InputExercise {
-  id: ID
+  userId: ID
   time: Int!
 }
 input InputProfile {
-  id: ID
+  userId: ID
   name: String!
   description: String
   age: Int!
@@ -79,23 +79,16 @@ input InputProfile {
   targetDailyCarorie: Int!
 }
 input InputMeal {
-  id: ID
+  userId: ID
   mealType: MealTypeEnum!
   foods: [InputFood!]!
 }
 
 input InputFood {
-  id: ID!
+  id: ID! #これなんのIDだ？
   name: String!
   estimateCalorie: Int!
   lastUsedDate: String!
-}
-input InputFields {
-  fields: [FieldInput!]!
-}
-input FieldInput {
-  id: ID!
-  field: FieldEnum!
 }
 
 type User {
