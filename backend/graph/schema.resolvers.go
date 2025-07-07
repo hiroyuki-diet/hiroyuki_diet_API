@@ -96,7 +96,10 @@ func (r *mutationResolver) EditMeal(ctx context.Context, input model.InputMeal) 
 
 // DeleteMeal is the resolver for the deleteMeal field.
 func (r *mutationResolver) DeleteMeal(ctx context.Context, input model.UUID) (*model.UUID, error) {
-	panic(fmt.Errorf("not implemented: DeleteMeal - deleteMeal"))
+	db := r.DB
+	mealModel := model.Meal{}
+	id, err := mealModel.Delete(input, db)
+	return id, err
 }
 
 // PostSkin is the resolver for the postSkin field.
