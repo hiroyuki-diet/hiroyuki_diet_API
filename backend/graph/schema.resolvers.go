@@ -94,6 +94,14 @@ func (r *mutationResolver) EditMeal(ctx context.Context, input model.InputMeal) 
 	return id, err
 }
 
+// DeleteMeal is the resolver for the deleteMeal field.
+func (r *mutationResolver) DeleteMeal(ctx context.Context, input model.UUID) (*model.UUID, error) {
+	db := r.DB
+	mealModel := model.Meal{}
+	id, err := mealModel.Delete(input, db)
+	return id, err
+}
+
 // PostSkin is the resolver for the postSkin field.
 func (r *mutationResolver) PostSkin(ctx context.Context, input model.UUID) (*model.UUID, error) {
 	panic(fmt.Errorf("not implemented: PostSkin - postSkin"))
@@ -205,3 +213,15 @@ type foodResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *mutationResolver) Delete(ctx context.Context, input model.UUID) (*model.UUID, error) {
+	panic(fmt.Errorf("not implemented: Delete - delete"))
+}
+*/

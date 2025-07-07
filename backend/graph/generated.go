@@ -98,6 +98,7 @@ type ComplexityRoot struct {
 		CreateExercise     func(childComplexity int, input model.InputExercise) int
 		CreateMeal         func(childComplexity int, input model.InputMeal) int
 		CreateProfile      func(childComplexity int, input model.InputProfile) int
+		DeleteMeal         func(childComplexity int, input model.UUID) int
 		EditExercise       func(childComplexity int, input model.InputExercise) int
 		EditMeal           func(childComplexity int, input model.InputMeal) int
 		EditProfile        func(childComplexity int, input model.InputProfile) int
@@ -180,6 +181,7 @@ type MutationResolver interface {
 	EditProfile(ctx context.Context, input model.InputProfile) (*model.UUID, error)
 	CreateMeal(ctx context.Context, input model.InputMeal) (*model.UUID, error)
 	EditMeal(ctx context.Context, input model.InputMeal) (*model.UUID, error)
+	DeleteMeal(ctx context.Context, input model.UUID) (*model.UUID, error)
 	PostSkin(ctx context.Context, input model.UUID) (*model.UUID, error)
 	UseItem(ctx context.Context, input model.UUID) (*model.UUID, error)
 }
@@ -428,6 +430,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CreateProfile(childComplexity, args["input"].(model.InputProfile)), true
+
+	case "Mutation.deleteMeal":
+		if e.complexity.Mutation.DeleteMeal == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteMeal_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteMeal(childComplexity, args["input"].(model.UUID)), true
 
 	case "Mutation.editExercise":
 		if e.complexity.Mutation.EditExercise == nil {
@@ -1024,6 +1038,29 @@ func (ec *executionContext) field_Mutation_createProfile_argsInput(
 	}
 
 	var zeroVal model.InputProfile
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteMeal_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteMeal_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteMeal_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (model.UUID, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, tmp)
+	}
+
+	var zeroVal model.UUID
 	return zeroVal, nil
 }
 
@@ -3114,6 +3151,58 @@ func (ec *executionContext) fieldContext_Mutation_editMeal(ctx context.Context, 
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_editMeal_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteMeal(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteMeal(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteMeal(rctx, fc.Args["input"].(model.UUID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UUID)
+	fc.Result = res
+	return ec.marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteMeal(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteMeal_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -7897,6 +7986,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "editMeal":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_editMeal(ctx, field)
+			})
+		case "deleteMeal":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteMeal(ctx, field)
 			})
 		case "postSkin":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {

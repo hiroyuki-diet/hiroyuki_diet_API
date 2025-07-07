@@ -155,6 +155,33 @@ func (*Meal) Edit(input InputMeal, db *gorm.DB) (*UUID, error) {
 	return &meal.Id, nil
 }
 
+func (*Meal) Delete(id UUID, db *gorm.DB) (*UUID, error) {
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	var meal Meal
+	err := db.Where("id = ?", id).First(&meal).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Model(&meal).Association("Foods").Clear()
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Delete(&meal).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &id, nil
+}
+
 func (*Meal) Seeder(db *gorm.DB) error {
 	var count int64
 
