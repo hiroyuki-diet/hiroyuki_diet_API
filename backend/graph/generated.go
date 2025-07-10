@@ -107,7 +107,7 @@ type ComplexityRoot struct {
 		PostSkin           func(childComplexity int, input model.InputPostSkin) int
 		ReceiptAchievement func(childComplexity int, input model.InputAchievement) int
 		SignUp             func(childComplexity int, input model.Auth) int
-		UseItem            func(childComplexity int, input model.UUID) int
+		UseItem            func(childComplexity int, input model.InputUseItem) int
 	}
 
 	Profile struct {
@@ -183,7 +183,7 @@ type MutationResolver interface {
 	EditMeal(ctx context.Context, input model.InputMeal) (*model.UUID, error)
 	DeleteMeal(ctx context.Context, input model.UUID) (*model.UUID, error)
 	PostSkin(ctx context.Context, input model.InputPostSkin) (*model.UUID, error)
-	UseItem(ctx context.Context, input model.UUID) (*model.UUID, error)
+	UseItem(ctx context.Context, input model.InputUseItem) (*model.UUID, error)
 }
 type QueryResolver interface {
 	User(ctx context.Context, id model.UUID) (*model.User, error)
@@ -549,7 +549,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UseItem(childComplexity, args["input"].(model.UUID)), true
+		return e.complexity.Mutation.UseItem(childComplexity, args["input"].(model.InputUseItem)), true
 
 	case "Profile.age":
 		if e.complexity.Profile.Age == nil {
@@ -856,7 +856,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputInputMeal,
 		ec.unmarshalInputInputPostSkin,
 		ec.unmarshalInputInputProfile,
-		ec.unmarshalInputUseItem,
+		ec.unmarshalInputInputUseItem,
 	)
 	first := true
 
@@ -1262,13 +1262,13 @@ func (ec *executionContext) field_Mutation_useItem_args(ctx context.Context, raw
 func (ec *executionContext) field_Mutation_useItem_argsInput(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (model.UUID, error) {
+) (model.InputUseItem, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, tmp)
+		return ec.unmarshalNInputUseItem2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputUseItem(ctx, tmp)
 	}
 
-	var zeroVal model.UUID
+	var zeroVal model.InputUseItem
 	return zeroVal, nil
 }
 
@@ -3276,7 +3276,7 @@ func (ec *executionContext) _Mutation_useItem(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UseItem(rctx, fc.Args["input"].(model.UUID))
+		return ec.resolvers.Mutation().UseItem(rctx, fc.Args["input"].(model.InputUseItem))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7530,20 +7530,27 @@ func (ec *executionContext) unmarshalInputInputProfile(ctx context.Context, obj 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUseItem(ctx context.Context, obj any) (model.UseItem, error) {
-	var it model.UseItem
+func (ec *executionContext) unmarshalInputInputUseItem(ctx context.Context, obj any) (model.InputUseItem, error) {
+	var it model.InputUseItem
 	asMap := map[string]any{}
 	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"itemId", "count"}
+	fieldsInOrder := [...]string{"userId", "itemId", "count"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "userId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserID = data
 		case "itemId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemId"))
 			data, err := ec.unmarshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, v)
@@ -9434,6 +9441,11 @@ func (ec *executionContext) unmarshalNInputPostSkin2githubᚗcomᚋmoXXchaᚋhir
 
 func (ec *executionContext) unmarshalNInputProfile2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputProfile(ctx context.Context, v any) (model.InputProfile, error) {
 	res, err := ec.unmarshalInputInputProfile(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNInputUseItem2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputUseItem(ctx context.Context, v any) (model.InputUseItem, error) {
+	res, err := ec.unmarshalInputInputUseItem(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

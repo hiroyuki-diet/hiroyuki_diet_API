@@ -52,9 +52,10 @@ type Mutation {
   editMeal(input: InputMeal!): ID
   deleteMeal(input: ID!): ID
   postSkin(input: InputPostSkin!): ID
-  useItem(input: ID!): ID
+  useItem(input: InputUseItem!): ID
 }
-input UseItem {
+input InputUseItem {
+  userId: ID!
   itemId: ID!
   count: Int!
 }
