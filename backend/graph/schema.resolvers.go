@@ -111,8 +111,11 @@ func (r *mutationResolver) PostSkin(ctx context.Context, input model.InputPostSk
 }
 
 // UseItem is the resolver for the useItem field.
-func (r *mutationResolver) UseItem(ctx context.Context, input model.UUID) (*model.UUID, error) {
-	panic(fmt.Errorf("not implemented: UseItem - useItem"))
+func (r *mutationResolver) UseItem(ctx context.Context, input model.InputUseItem) (*model.UUID, error) {
+	db := r.DB
+	itemModel := model.MasterItem{}
+	id, err := itemModel.Use(input, db)
+	return id, err
 }
 
 // User is the resolver for the user field.
