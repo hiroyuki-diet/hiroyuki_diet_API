@@ -28,6 +28,11 @@ type InputMeal struct {
 	Foods    []UUID         `json:"foods"`
 }
 
+type InputPostSkin struct {
+	UserID UUID `json:"userId"`
+	SkinID UUID `json:"skinId"`
+}
+
 type InputProfile struct {
 	UserID                  UUID   `json:"userId"`
 	UserName                string `json:"userName"`

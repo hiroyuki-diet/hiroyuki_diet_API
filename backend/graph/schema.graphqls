@@ -51,12 +51,17 @@ type Mutation {
   createMeal(input: InputMeal!): ID
   editMeal(input: InputMeal!): ID
   deleteMeal(input: ID!): ID
-  postSkin(input: ID!): ID
+  postSkin(input: InputPostSkin!): ID
   useItem(input: ID!): ID
 }
 input UseItem {
   itemId: ID!
   count: Int!
+}
+
+input InputPostSkin {
+  userId: ID!
+  skinId: ID!
 }
 
 input InputAchievement {

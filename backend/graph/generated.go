@@ -104,7 +104,7 @@ type ComplexityRoot struct {
 		EditProfile        func(childComplexity int, input model.InputProfile) int
 		Login              func(childComplexity int, input model.Auth) int
 		Logout             func(childComplexity int, input model.UUID) int
-		PostSkin           func(childComplexity int, input model.UUID) int
+		PostSkin           func(childComplexity int, input model.InputPostSkin) int
 		ReceiptAchievement func(childComplexity int, input model.InputAchievement) int
 		SignUp             func(childComplexity int, input model.Auth) int
 		UseItem            func(childComplexity int, input model.UUID) int
@@ -182,7 +182,7 @@ type MutationResolver interface {
 	CreateMeal(ctx context.Context, input model.InputMeal) (*model.UUID, error)
 	EditMeal(ctx context.Context, input model.InputMeal) (*model.UUID, error)
 	DeleteMeal(ctx context.Context, input model.UUID) (*model.UUID, error)
-	PostSkin(ctx context.Context, input model.UUID) (*model.UUID, error)
+	PostSkin(ctx context.Context, input model.InputPostSkin) (*model.UUID, error)
 	UseItem(ctx context.Context, input model.UUID) (*model.UUID, error)
 }
 type QueryResolver interface {
@@ -513,7 +513,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Mutation.PostSkin(childComplexity, args["input"].(model.UUID)), true
+		return e.complexity.Mutation.PostSkin(childComplexity, args["input"].(model.InputPostSkin)), true
 
 	case "Mutation.receiptAchievement":
 		if e.complexity.Mutation.ReceiptAchievement == nil {
@@ -854,6 +854,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputInputAchievement,
 		ec.unmarshalInputInputExercise,
 		ec.unmarshalInputInputMeal,
+		ec.unmarshalInputInputPostSkin,
 		ec.unmarshalInputInputProfile,
 		ec.unmarshalInputUseItem,
 	)
@@ -1192,13 +1193,13 @@ func (ec *executionContext) field_Mutation_postSkin_args(ctx context.Context, ra
 func (ec *executionContext) field_Mutation_postSkin_argsInput(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (model.UUID, error) {
+) (model.InputPostSkin, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, tmp)
+		return ec.unmarshalNInputPostSkin2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputPostSkin(ctx, tmp)
 	}
 
-	var zeroVal model.UUID
+	var zeroVal model.InputPostSkin
 	return zeroVal, nil
 }
 
@@ -3223,7 +3224,7 @@ func (ec *executionContext) _Mutation_postSkin(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().PostSkin(rctx, fc.Args["input"].(model.UUID))
+		return ec.resolvers.Mutation().PostSkin(rctx, fc.Args["input"].(model.InputPostSkin))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7412,6 +7413,40 @@ func (ec *executionContext) unmarshalInputInputMeal(ctx context.Context, obj any
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputInputPostSkin(ctx context.Context, obj any) (model.InputPostSkin, error) {
+	var it model.InputPostSkin
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"userId", "skinId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "userId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserID = data
+		case "skinId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skinId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SkinID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputInputProfile(ctx context.Context, obj any) (model.InputProfile, error) {
 	var it model.InputProfile
 	asMap := map[string]any{}
@@ -9389,6 +9424,11 @@ func (ec *executionContext) unmarshalNInputExercise2githubᚗcomᚋmoXXchaᚋhir
 
 func (ec *executionContext) unmarshalNInputMeal2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputMeal(ctx context.Context, v any) (model.InputMeal, error) {
 	res, err := ec.unmarshalInputInputMeal(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNInputPostSkin2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputPostSkin(ctx context.Context, v any) (model.InputPostSkin, error) {
+	res, err := ec.unmarshalInputInputPostSkin(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

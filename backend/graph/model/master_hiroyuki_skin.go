@@ -50,6 +50,35 @@ func (*MasterHiroyukiSkin) GetSkins(id UUID, isUsingSkin bool, db *gorm.DB) ([]*
 	return skins, nil
 }
 
+func (*MasterHiroyukiSkin) Post(input InputPostSkin, db *gorm.DB) (*UUID, error) {
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	var userSkin UserSkin
+	err := db.Where("user_id = ? AND skin_id = ?", input.UserID, input.SkinID).First(&userSkin).Error
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("your skin not found")
+		}
+		return nil, err
+	}
+
+	if userSkin.IsUsing {
+		return nil, fmt.Errorf("this skin is already in use")
+	}
+
+	userSkin.IsUsing = true
+	err = db.Save(&userSkin).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &userSkin.Id, nil
+}
+
 func (*MasterHiroyukiSkin) FirstCreate(db *gorm.DB) error {
 	skins := []MasterHiroyukiSkin{
 		{
