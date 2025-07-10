@@ -17,24 +17,25 @@ type MasterAchievement struct {
 }
 
 func (*MasterAchievement) FirstCreate(db *gorm.DB) error {
-	achievements := []MasterAchievement{
-		{
-			Name:        "初ログイン",
-			Description: "初回ログイン達成実績",
-		},
-		{
-			Name:        "レベル5達成",
-			Description: "レベル5達成実績",
-		},
-	}
-
-	for i := range achievements {
-		result := db.FirstOrCreate(&achievements[i], MasterAchievement{Name: achievements[i].Name})
-		if result.Error != nil {
-			return result.Error
+	return db.Transaction(func(tx *gorm.DB) error {
+		achievements := []MasterAchievement{
+			{
+				Name:        "初ログイン",
+				Description: "初回ログイン達成実績",
+			},
+			{
+				Name:        "レベル5達成",
+				Description: "レベル5達成実績",
+			},
 		}
-	}
-	return nil
+
+		for i := range achievements {
+			if err := tx.FirstOrCreate(&achievements[i], MasterAchievement{Name: achievements[i].Name}).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 func (*MasterAchievement) GetAchievement(id UUID, db *gorm.DB) ([]*AchievementResponse, error) {
@@ -66,22 +67,28 @@ func (*MasterAchievement) Receipt(input InputAchievement, db *gorm.DB) (*UUID, e
 		return nil, fmt.Errorf("db is nil")
 	}
 
-	var userAchievement UserAchievement
-	err := db.Where("user_id = ?", input.UserID).Where("achievement_id = ?", input.AchievementID).First(&userAchievement).Error
+	var achievementId UUID
+	err := db.Transaction(func(tx *gorm.DB) error {
+		var userAchievement UserAchievement
+		if err := tx.Where("user_id = ?", input.UserID).Where("achievement_id = ?", input.AchievementID).First(&userAchievement).Error; err == nil {
+			return fmt.Errorf("already receipt")
+		}
 
-	if err == nil {
-		return nil, fmt.Errorf("allready receipt")
-	}
+		achievement := UserAchievement{
+			UserId:        input.UserID,
+			AchievementId: input.AchievementID,
+		}
+		if err := tx.Model(&UserAchievement{}).Create(&achievement).Error; err != nil {
+			return err
+		}
 
-	achievement := UserAchievement{
-		UserId:        input.UserID,
-		AchievementId: input.AchievementID,
-	}
-	err = db.Model(&UserAchievement{}).Create(&achievement).Error
+		achievementId = achievement.Id
+		return nil
+	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &achievement.Id, nil
+	return &achievementId, nil
 }

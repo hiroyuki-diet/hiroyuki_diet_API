@@ -103,43 +103,41 @@ func (*Exercise) Edit(input InputExercise, db *gorm.DB) (*UUID, error) {
 		return nil, fmt.Errorf("db is nil")
 	}
 
-	todayStr := time.Now().Format("2006-01-02")
-	layout := "2006-01-02"
+	var exerciseId UUID
+	err := db.Transaction(func(tx *gorm.DB) error {
+		todayStr := time.Now().Format("2006-01-02")
+		layout := "2006-01-02"
 
-	t, err := time.Parse(layout, todayStr)
+		t, err := time.Parse(layout, todayStr)
+		if err != nil {
+			return err
+		}
+
+		exerciseInput := Exercise{
+			Time: input.Time,
+		}
+
+		var exercise Exercise
+
+		if err := tx.Model(&Exercise{}).Where("user_id = ?", input.UserID).Where("date = ?", t).First(&exercise).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Model(&Exercise{}).Where("user_id = ?", input.UserID).Where("date = ?", t).Updates(exerciseInput).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("user_id = ?", input.UserID).Where("date = ?", t).First(&exercise).Error; err != nil {
+			return err
+		}
+
+		exerciseId = exercise.Id
+		return nil
+	})
+
 	if err != nil {
 		return nil, err
 	}
 
-	exerciseInput := Exercise{
-		Time: input.Time,
-	}
-
-	var exercise Exercise
-
-	err = db.Model(&Exercise{}).
-		Where("user_id = ?", input.UserID).
-		Where("date = ?", t).First(&exercise).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	err = db.Model(&Exercise{}).
-		Where("user_id = ?", input.UserID).
-		Where("date = ?", t).
-		Updates(exerciseInput).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	err = db.Where("user_id = ?", input.UserID).Where("date = ?", t).First(&exercise).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &exercise.Id, nil
-
+	return &exerciseId, nil
 }

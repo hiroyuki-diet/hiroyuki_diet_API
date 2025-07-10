@@ -105,37 +105,45 @@ func (*Profile) Create(input InputProfile, db *gorm.DB) (*UUID, error) {
 }
 
 func (*Profile) Edit(input InputProfile, db *gorm.DB) (*UUID, error) {
-	var profile Profile
-
 	if db == nil {
 		return nil, fmt.Errorf("db is nil")
 	}
 
-	err := db.Where("user_id = ?", input.UserID).First(&profile).Error
+	var profileId UUID
+	err := db.Transaction(func(tx *gorm.DB) error {
+		var profile Profile
+		if err := tx.Where("user_id = ?", input.UserID).First(&profile).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return fmt.Errorf("profile not found")
+			}
+			return err
+		}
 
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, fmt.Errorf("profile not found")
-	}
+		profileInput := Profile{
+			UserName:                input.UserName,
+			UserId:                  input.UserID,
+			Age:                     input.Age,
+			Gender:                  utils.Gender(input.Gender),
+			Weight:                  input.Weight,
+			Height:                  input.Height,
+			TargetWeight:            input.TargetWeight,
+			TargetDailyCarorie:      input.TargetDailyCarorie,
+			TargetDailyExerciseTime: input.TargetDailyExerciseTime,
+			Favorability:            0,
+			IsCreated:               true,
+		}
 
-	profileInput := Profile{
-		UserName:                input.UserName,
-		UserId:                  input.UserID,
-		Age:                     input.Age,
-		Gender:                  utils.Gender(input.Gender),
-		Weight:                  input.Weight,
-		Height:                  input.Height,
-		TargetWeight:            input.TargetWeight,
-		TargetDailyCarorie:      input.TargetDailyCarorie,
-		TargetDailyExerciseTime: input.TargetDailyExerciseTime,
-		Favorability:            0,
-		IsCreated:               true,
-	}
+		if err := tx.Model(&Profile{}).Where("user_id = ?", input.UserID).Updates(&profileInput).Error; err != nil {
+			return err
+		}
 
-	err = db.Model(&Profile{}).Where("user_id = ?", input.UserID).Updates(&profileInput).Error
+		profileId = profile.Id
+		return nil
+	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &profile.Id, nil
+	return &profileId, nil
 }

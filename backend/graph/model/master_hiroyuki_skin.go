@@ -54,61 +54,67 @@ func (*MasterHiroyukiSkin) Post(input InputPostSkin, db *gorm.DB) (*UUID, error)
 	if db == nil {
 		return nil, fmt.Errorf("db is nil")
 	}
-
-	var userSkin UserSkin
-	err := db.Where("user_id = ? AND skin_id = ?", input.UserID, input.SkinID).First(&userSkin).Error
-
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("your skin not found")
+	var userSkinId UUID
+	err := db.Transaction(func(tx *gorm.DB) error {
+		var userSkin UserSkin
+		if err := tx.Where("user_id = ? AND skin_id = ?", input.UserID, input.SkinID).First(&userSkin).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return fmt.Errorf("user skin not found")
+			}
+			return err
 		}
-		return nil, err
-	}
 
-	if userSkin.IsUsing {
-		return nil, fmt.Errorf("this skin is already in use")
-	}
+		if userSkin.IsUsing {
+			return fmt.Errorf("this skin is already in use")
+		}
 
-	userSkin.IsUsing = true
-	err = db.Save(&userSkin).Error
+		userSkin.IsUsing = true
+		if err := tx.Save(&userSkin).Error; err != nil {
+			return err
+		}
+
+		userSkinId = userSkin.Id
+		return nil
+	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &userSkin.Id, nil
+	return &userSkinId, nil
 }
 
 func (*MasterHiroyukiSkin) FirstCreate(db *gorm.DB) error {
-	skins := []MasterHiroyukiSkin{
-		{
-			Name:         "鬼のツノ",
-			Part:         "head",
-			SkinImage:    "",
-			Description:  "鬼のツノ。げきおこ",
-			ReleaseLevel: 5,
-		},
-		{
-			Name:         "まるメガネ",
-			Part:         "face",
-			SkinImage:    "",
-			Description:  "かわいいまるメガネ。知的に見えるかも？",
-			ReleaseLevel: 5,
-		},
-		{
-			Name:         "論破Tシャツ",
-			Part:         "body",
-			SkinImage:    "",
-			Description:  "なにやってんですか。運動してください",
-			ReleaseLevel: 5,
-		},
-	}
-
-	for i := range skins {
-		result := db.FirstOrCreate(&skins[i], MasterHiroyukiSkin{Name: skins[i].Name})
-		if result.Error != nil {
-			return result.Error
+	return db.Transaction(func(tx *gorm.DB) error {
+		skins := []MasterHiroyukiSkin{
+			{
+				Name:         "鬼のツノ",
+				Part:         "head",
+				SkinImage:    "",
+				Description:  "鬼のツノ。げきおこ",
+				ReleaseLevel: 5,
+			},
+			{
+				Name:         "まるメガネ",
+				Part:         "face",
+				SkinImage:    "",
+				Description:  "かわいいまるメガネ。知的に見えるかも？",
+				ReleaseLevel: 5,
+			},
+			{
+				Name:         "論破Tシャツ",
+				Part:         "body",
+				SkinImage:    "",
+				Description:  "なにやってんですか。運動してください",
+				ReleaseLevel: 5,
+			},
 		}
-	}
-	return nil
+
+		for i := range skins {
+			if err := tx.FirstOrCreate(&skins[i], MasterHiroyukiSkin{Name: skins[i].Name}).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }

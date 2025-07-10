@@ -69,29 +69,28 @@ func (*MasterHiroyukiVoice) GetVoices(id UUID, fields []utils.Field, db *gorm.DB
 }
 
 func (*MasterHiroyukiVoice) FirstCreate(db *gorm.DB) error {
-	var fields []MasterField
-	fieldsStr := []string{"home", "chibi_hiroyuki"}
+	return db.Transaction(func(tx *gorm.DB) error {
+		var fields []MasterField
+		fieldsStr := []string{"home", "chibi_hiroyuki"}
 
-	err := db.Where("field IN ?", fieldsStr).Find(&fields).Error
-
-	if err != nil {
-		return err
-	}
-
-	voicies := []MasterHiroyukiVoice{
-		{
-			Name:         "よろしく",
-			VoiceUrl:     "",
-			ReleaseLevel: 0,
-			VoiceFields:  fields,
-		},
-	}
-
-	for i := range voicies {
-		result := db.FirstOrCreate(&voicies[i], MasterHiroyukiVoice{Name: voicies[i].Name})
-		if result.Error != nil {
-			return result.Error
+		if err := tx.Where("field IN ?", fieldsStr).Find(&fields).Error; err != nil {
+			return err
 		}
-	}
-	return nil
+
+		voicies := []MasterHiroyukiVoice{
+			{
+				Name:         "よろしく",
+				VoiceUrl:     "",
+				ReleaseLevel: 0,
+				VoiceFields:  fields,
+			},
+		}
+
+		for i := range voicies {
+			if err := tx.FirstOrCreate(&voicies[i], MasterHiroyukiVoice{Name: voicies[i].Name}).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }

@@ -18,51 +18,57 @@ type MasterItem struct {
 }
 
 func (*MasterItem) FirstCreate(db *gorm.DB) error {
-	items := []MasterItem{
-		{
-			Name:        "チートデイチケット",
-			Description: "頑張ったごほうび！使ったら一日やすんでいいよ",
-			ItemImage:   "",
-		},
-	}
-
-	for i := range items {
-		result := db.FirstOrCreate(&items[i], MasterItem{Name: items[i].Name})
-		if result.Error != nil {
-			return result.Error
+	return db.Transaction(func(tx *gorm.DB) error {
+		items := []MasterItem{
+			{
+				Name:        "チートデイチケット",
+				Description: "頑張ったごほうび！使ったら一日やすんでいいよ",
+				ItemImage:   "",
+			},
 		}
-	}
-	return nil
-}
 
+		for i := range items {
+			if err := tx.FirstOrCreate(&items[i], MasterItem{Name: items[i].Name}).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
 
 func (*MasterItem) Use(input InputUseItem, db *gorm.DB) (*UUID, error) {
 	if db == nil {
 		return nil, fmt.Errorf("db is nil")
 	}
 
-	var userItem UserItem
-	err := db.Where("user_id = ? AND item_id = ?", input.UserID, input.ItemID).First(&userItem).Error
-
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("user item not found")
+	var userItemId UUID
+	err := db.Transaction(func(tx *gorm.DB) error {
+		var userItem UserItem
+		if err := tx.Where("user_id = ? AND item_id = ?", input.UserID, input.ItemID).First(&userItem).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return fmt.Errorf("user item not found")
+			}
+			return err
 		}
-		return nil, err
-	}
 
-	if userItem.Count < input.Count {
-		return nil, fmt.Errorf("not enough items")
-	}
+		if userItem.Count < input.Count {
+			return fmt.Errorf("not enough items")
+		}
 
-	userItem.Count -= input.Count
-	err = db.Save(&userItem).Error
+		userItem.Count -= input.Count
+		if err := tx.Save(&userItem).Error; err != nil {
+			return err
+		}
+
+		userItemId = userItem.Id
+		return nil
+	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &userItem.Id, nil
+	return &userItemId, nil
 }
 
 func (*MasterItem) GetAllByUserId(id UUID, db *gorm.DB) ([]*ItemResponse, error) {
