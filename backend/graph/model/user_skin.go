@@ -21,42 +21,37 @@ type UserSkin struct {
 }
 
 func (*UserSkin) Seeder(db *gorm.DB) error {
-	var count int64
+	return db.Transaction(func(tx *gorm.DB) error {
+		var count int64
 
-	// main.goが実行される度にレコードが生成されないようにする。
-	db.Model(&UserSkin{}).Count(&count)
-	if count > 0 {
+		// main.goが実行される度にレコードが生成されないようにする。
+		tx.Model(&UserSkin{}).Count(&count)
+		if count > 0 {
+			return nil
+		}
+
+		var user *User
+		if err := tx.First(&user).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return fmt.Errorf("user not found")
+			}
+			return err
+		}
+
+		var skin MasterHiroyukiSkin
+		if err := tx.First(&skin).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return fmt.Errorf("skin not found")
+			}
+			return err
+		}
+
+		userSkin := UserSkin{UserId: user.Id, SkinId: skin.Id, IsUsing: true}
+
+		if err := tx.Create(&userSkin).Error; err != nil {
+			return err
+		}
+
 		return nil
-	}
-
-	var user *User
-	err := db.First(&user).Error
-
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return fmt.Errorf("user not found")
-	}
-	if err != nil {
-		return err
-	}
-
-	var skin MasterHiroyukiSkin
-	err = db.First(&skin).Error
-
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return fmt.Errorf("skin not found")
-	}
-
-	if err != nil {
-		return err
-	}
-
-	userSkin := UserSkin{UserId: user.Id, SkinId: skin.Id, IsUsing: true}
-
-	err = db.Create(&userSkin).Error
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	})
 }

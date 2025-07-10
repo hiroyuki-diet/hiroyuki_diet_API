@@ -16,57 +16,58 @@ type MasterField struct {
 }
 
 func (*MasterField) FirstCreate(db *gorm.DB) error {
-	fields := []MasterField{
-		{
-			Field: "login",
-		},
-		{
-			Field: "signin",
-		},
-		{
-			Field: "home",
-		},
-		{
-			Field: "meal",
-		},
-		{
-			Field: "meal_form",
-		},
-		{
-			Field: "meal_edit",
-		},
-		{
-			Field: "data",
-		},
-		{
-			Field: "profile",
-		},
-		{
-			Field: "profile_edit",
-		},
-		{
-			Field: "exercise",
-		},
-		{
-			Field: "exercise_complete",
-		},
-		{
-			Field: "achievement",
-		},
-		{
-			Field: "achievement_complete",
-		},
-		{
-			Field: "chibi_hiroyuki",
-		},
-	}
-
-	for i := range fields {
-		err := db.FirstOrCreate(&fields[i], "field = ?", fields[i].Field).Error
-		if err != nil {
-			return err
+	return db.Transaction(func(tx *gorm.DB) error {
+		fields := []MasterField{
+			{
+				Field: "login",
+			},
+			{
+				Field: "signin",
+			},
+			{
+				Field: "home",
+			},
+			{
+				Field: "meal",
+			},
+			{
+				Field: "meal_form",
+			},
+			{
+				Field: "meal_edit",
+			},
+			{
+				Field: "data",
+			},
+			{
+				Field: "profile",
+			},
+			{
+				Field: "profile_edit",
+			},
+			{
+				Field: "exercise",
+			},
+			{
+				Field: "exercise_complete",
+			},
+			{
+				Field: "achievement",
+			},
+			{
+				Field: "achievement_complete",
+			},
+			{
+				Field: "chibi_hiroyuki",
+			},
 		}
-	}
 
-	return nil
+		for i := range fields {
+			if err := tx.FirstOrCreate(&fields[i], "field = ?", fields[i].Field).Error; err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
 }

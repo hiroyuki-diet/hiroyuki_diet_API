@@ -58,101 +58,104 @@ func (*Meal) Create(input InputMeal, db *gorm.DB) (*UUID, error) {
 		return nil, fmt.Errorf("db is nil")
 	}
 
-	var foods []Food
+	var mealId UUID
+	err := db.Transaction(func(tx *gorm.DB) error {
+		var foods []Food
+		if err := tx.Where("id IN ?", input.Foods).Find(&foods).Error; err != nil {
+			return err
+		}
 
-	err := db.Where("id IN ?", input.Foods).Find(&foods).Error
+		totalCalorie := 0
+		for _, food := range foods {
+			totalCalorie += food.EstimateCalorie
+		}
+
+		mealInput := Meal{
+			UserId:       *input.UserID,
+			MealType:     input.MealType,
+			TotalCalorie: totalCalorie,
+			Foods:        foods,
+		}
+
+		if err := tx.Create(&mealInput).Error; err != nil {
+			return err
+		}
+
+		todayStr := time.Now().Format("2006-01-02")
+		layout := "2006-01-02"
+
+		t, err := time.Parse(layout, todayStr)
+		if err != nil {
+			return err
+		}
+
+		if err := tx.Model(&Food{}).Where("id IN ?", input.Foods).Update("last_used_date", t).Error; err != nil {
+			return err
+		}
+
+		mealId = mealInput.Id
+		return nil
+	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	totalCalorie := 0
-	for _, food := range foods {
-		totalCalorie += food.EstimateCalorie
-	}
-
-	mealInput := Meal{
-		UserId:       *input.UserID,
-		MealType:     input.MealType,
-		TotalCalorie: totalCalorie,
-		Foods:        foods,
-	}
-
-	err = db.Create(&mealInput).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	todayStr := time.Now().Format("2006-01-02")
-	layout := "2006-01-02"
-
-	t, err := time.Parse(layout, todayStr)
-	if err != nil {
-		return nil, err
-	}
-
-	err = db.Model(&Food{}).Where("id IN ?", input.Foods).Update("last_used_date", t).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &mealInput.Id, nil
+	return &mealId, nil
 }
 
 func (*Meal) Edit(input InputMeal, db *gorm.DB) (*UUID, error) {
-	var foods []Food
+	var mealId UUID
+	err := db.Transaction(func(tx *gorm.DB) error {
+		var foods []Food
+		if err := tx.Where("id IN ?", input.Foods).Find(&foods).Error; err != nil {
+			return err
+		}
 
-	err := db.Where("id IN ?", input.Foods).Find(&foods).Error
+		totalCalorie := 0
+		for _, food := range foods {
+			totalCalorie += food.EstimateCalorie
+		}
+
+		var meal Meal
+		if err := tx.Where("id = ?", input.MealID).First(&meal).Error; err != nil {
+			return err
+		}
+
+		mealInput := Meal{
+			MealType:     input.MealType,
+			TotalCalorie: totalCalorie,
+		}
+
+		if err := tx.Where("id = ?", input.MealID).Updates(&mealInput).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Model(&meal).Association("Foods").Replace(foods); err != nil {
+			return err
+		}
+
+		todayStr := time.Now().Format("2006-01-02")
+		layout := "2006-01-02"
+
+		t, err := time.Parse(layout, todayStr)
+		if err != nil {
+			return err
+		}
+
+		if err := tx.Model(&Food{}).Where("id IN ?", input.Foods).Update("last_used_date", t).Error; err != nil {
+			return err
+		}
+
+		mealId = meal.Id
+		return nil
+	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	totalCalorie := 0
-	for _, food := range foods {
-		totalCalorie += food.EstimateCalorie
-	}
-
-	var meal Meal
-	err = db.Where("id = ?", input.MealID).First(&meal).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	mealInput := Meal{
-		MealType:     input.MealType,
-		TotalCalorie: totalCalorie,
-	}
-
-	err = db.Where("id = ?", input.MealID).Updates(&mealInput).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	err = db.Model(&meal).Association("Foods").Replace(foods)
-	if err != nil {
-		return nil, err
-	}
-
-	todayStr := time.Now().Format("2006-01-02")
-	layout := "2006-01-02"
-
-	t, err := time.Parse(layout, todayStr)
-	if err != nil {
-		return nil, err
-	}
-
-	err = db.Model(&Food{}).Where("id IN ?", input.Foods).Update("last_used_date", t).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &meal.Id, nil
+	return &mealId, nil
 }
 
 func (*Meal) Delete(id UUID, db *gorm.DB) (*UUID, error) {
@@ -160,20 +163,22 @@ func (*Meal) Delete(id UUID, db *gorm.DB) (*UUID, error) {
 		return nil, fmt.Errorf("db is nil")
 	}
 
-	var meal Meal
-	err := db.Where("id = ?", id).First(&meal).Error
+	err := db.Transaction(func(tx *gorm.DB) error {
+		var meal Meal
+		if err := tx.Where("id = ?", id).First(&meal).Error; err != nil {
+			return err
+		}
 
-	if err != nil {
-		return nil, err
-	}
+		if err := tx.Model(&meal).Association("Foods").Clear(); err != nil {
+			return err
+		}
 
-	err = db.Model(&meal).Association("Foods").Clear()
+		if err := tx.Delete(&meal).Error; err != nil {
+			return err
+		}
 
-	if err != nil {
-		return nil, err
-	}
-
-	err = db.Delete(&meal).Error
+		return nil
+	})
 
 	if err != nil {
 		return nil, err

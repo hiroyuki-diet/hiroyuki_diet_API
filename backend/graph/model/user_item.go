@@ -21,43 +21,37 @@ type UserItem struct {
 }
 
 func (*UserItem) Seeder(db *gorm.DB) error {
-	var count int64
+	return db.Transaction(func(tx *gorm.DB) error {
+		var count int64
 
-	// main.goが実行される度にレコードが生成されないようにする。
-	db.Model(&UserItem{}).Count(&count)
-	if count > 0 {
+		// main.goが実行される度にレコードが生成されないようにする。
+		tx.Model(&UserItem{}).Count(&count)
+		if count > 0 {
+			return nil
+		}
+
+		var user User
+		if err := tx.First(&user).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return fmt.Errorf("user not found")
+			}
+			return err
+		}
+
+		var item MasterItem
+		if err := tx.First(&item).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return fmt.Errorf("item not found")
+			}
+			return err
+		}
+
+		userItem := UserItem{UserId: user.Id, ItemId: item.Id, Count: 1}
+
+		if err := tx.Create(&userItem).Error; err != nil {
+			return err
+		}
+
 		return nil
-	}
-
-	var user User
-	err := db.First(&user).Error
-
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return fmt.Errorf("user not found")
-	}
-
-	if err != nil {
-		return err
-	}
-
-	var item MasterItem
-	err = db.First(&item).Error
-
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return fmt.Errorf("item not found")
-	}
-
-	if err != nil {
-		return err
-	}
-
-	userItem := UserItem{UserId: user.Id, ItemId: item.Id, Count: 1}
-
-	err = db.Create(&userItem).Error
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	})
 }
