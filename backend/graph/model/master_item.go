@@ -35,7 +35,38 @@ func (*MasterItem) FirstCreate(db *gorm.DB) error {
 	return nil
 }
 
+
+func (*MasterItem) Use(input InputUseItem, db *gorm.DB) (*UUID, error) {
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	var userItem UserItem
+	err := db.Where("user_id = ? AND item_id = ?", input.UserID, input.ItemID).First(&userItem).Error
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("user item not found")
+		}
+		return nil, err
+	}
+
+	if userItem.Count < input.Count {
+		return nil, fmt.Errorf("not enough items")
+	}
+
+	userItem.Count -= input.Count
+	err = db.Save(&userItem).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &userItem.Id, nil
+}
+
 func (*MasterItem) GetAllByUserId(id UUID, db *gorm.DB) ([]*ItemResponse, error) {
+
 	var responses []*ItemResponse
 
 	if db == nil {

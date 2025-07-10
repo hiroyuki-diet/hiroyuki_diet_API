@@ -45,13 +45,14 @@ type InputProfile struct {
 	TargetDailyCarorie      int    `json:"targetDailyCarorie"`
 }
 
+type InputUseItem struct {
+	UserID UUID `json:"userId"`
+	ItemID UUID `json:"itemId"`
+	Count  int  `json:"count"`
+}
+
 type Mutation struct {
 }
 
 type Query struct {
-}
-
-type UseItem struct {
-	ItemID UUID `json:"itemId"`
-	Count  int  `json:"count"`
 }
