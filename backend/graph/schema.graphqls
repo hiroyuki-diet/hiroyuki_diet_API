@@ -41,6 +41,7 @@ type Query {
 
 type Mutation {
   signUp(input: Auth!): ID
+  tokenAuth(input: InputTokenAuth!): ID
   login(input: Auth!): String
   logout(input: ID!): ID
   createExercise(input: InputExercise!): ID
@@ -58,6 +59,11 @@ input InputUseItem {
   userId: ID!
   itemId: ID!
   count: Int!
+}
+
+input InputTokenAuth {
+  userId: ID!
+  token: Int!
 }
 
 input InputPostSkin {
