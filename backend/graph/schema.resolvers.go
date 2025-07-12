@@ -24,8 +24,11 @@ func (r *foodResolver) LastUsedDate(ctx context.Context, obj *model.Food) (strin
 }
 
 // SignUp is the resolver for the signUp field.
-func (r *mutationResolver) SignUp(ctx context.Context, input model.Auth) (*string, error) {
-	panic(fmt.Errorf("not implemented: SignUp - signUp"))
+func (r *mutationResolver) SignUp(ctx context.Context, input model.Auth) (*model.UUID, error) {
+	db := r.DB
+	userModel := model.User{}
+	id, err := userModel.SignUp(input, db)
+	return id, err
 }
 
 // Login is the resolver for the login field.

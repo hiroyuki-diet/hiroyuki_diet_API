@@ -171,7 +171,7 @@ type FoodResolver interface {
 	LastUsedDate(ctx context.Context, obj *model.Food) (string, error)
 }
 type MutationResolver interface {
-	SignUp(ctx context.Context, input model.Auth) (*string, error)
+	SignUp(ctx context.Context, input model.Auth) (*model.UUID, error)
 	Login(ctx context.Context, input model.Auth) (*string, error)
 	Logout(ctx context.Context, input model.UUID) (*model.UUID, error)
 	CreateExercise(ctx context.Context, input model.InputExercise) (*model.UUID, error)
@@ -2661,9 +2661,9 @@ func (ec *executionContext) _Mutation_signUp(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(*model.UUID)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_signUp(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2673,7 +2673,7 @@ func (ec *executionContext) fieldContext_Mutation_signUp(ctx context.Context, fi
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	defer func() {
