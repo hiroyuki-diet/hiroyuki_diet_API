@@ -4,7 +4,9 @@ go 1.24
 
 require (
 	github.com/99designs/gqlgen v0.17.75
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/uuid v1.6.0
+	github.com/joho/godotenv v1.5.1
 	github.com/vektah/gqlparser/v2 v2.5.28
 	golang.org/x/crypto v0.31.0
 	gorm.io/driver/postgres v1.6.0

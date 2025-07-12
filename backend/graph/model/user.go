@@ -129,13 +129,25 @@ func (*User) SignUp(input Auth, db *gorm.DB) (*UUID, error) {
 	return &user.Id, nil
 }
 
-func (*User) TokenAuth(input InputTokenAuth, db *gorm.DB) (*UUID, error) {
+func (*User) TokenAuth(input InputTokenAuth, db *gorm.DB) (*JWTTokenResponse, error) {
 	if db == nil {
 		return nil, fmt.Errorf("db is nil")
 	}
 
+	tx := db.Begin()
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	// エラーが発生した場合にロールバックを確実に行う
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
 	var user User
-	if err := db.Where("id = ?", input.UserID).First(&user).Error; err != nil {
+	if err := tx.Where("id = ?", input.UserID).First(&user).Error; err != nil {
+		tx.Rollback()
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("ユーザーが見つかりません")
 		}
@@ -143,11 +155,13 @@ func (*User) TokenAuth(input InputTokenAuth, db *gorm.DB) (*UUID, error) {
 	}
 
 	if user.IsTokenAuthenticated {
+		tx.Rollback()
 		return nil, fmt.Errorf("すでに認証済みです")
 	}
 
 	var signUpToken SignUpToken
-	if err := db.Where("id = ?", user.SignUpTokenId).First(&signUpToken).Error; err != nil {
+	if err := tx.Where("id = ?", user.SignUpTokenId).First(&signUpToken).Error; err != nil {
+		tx.Rollback()
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("トークンが見つかりません")
 		}
@@ -155,13 +169,32 @@ func (*User) TokenAuth(input InputTokenAuth, db *gorm.DB) (*UUID, error) {
 	}
 
 	if signUpToken.Token != input.Token {
+		tx.Rollback()
 		return nil, fmt.Errorf("トークンが一致しません")
 	}
 
 	user.IsTokenAuthenticated = true
-	if err := db.Save(&user).Error; err != nil {
+	if err := tx.Save(&user).Error; err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
-	return &user.Id, nil
+	// JWTトークンを生成
+	token, err := utils.GenerateJWT(user.Id.String(), user.IsTokenAuthenticated, time.Hour*24)
+	if err != nil {
+		tx.Rollback()
+		return nil, fmt.Errorf("failed to generate JWT: %w", err)
+	}
+
+	// すべての処理が成功したらコミット
+	if err := tx.Commit().Error; err != nil {
+		return nil, err
+	}
+
+	tokenResponse := JWTTokenResponse{
+		UserId: user.Id,
+		Token:  token,
+	}
+
+	return &tokenResponse, nil
 }
