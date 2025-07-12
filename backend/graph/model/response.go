@@ -35,3 +35,8 @@ type HiroyukiVoiceResponse struct {
 	Fields       []utils.Field
 	IsHaving     bool
 }
+
+type JWTTokenResponse struct {
+	UserId UUID
+	Token  string
+}
