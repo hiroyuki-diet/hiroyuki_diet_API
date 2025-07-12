@@ -128,3 +128,40 @@ func (*User) SignUp(input Auth, db *gorm.DB) (*UUID, error) {
 
 	return &user.Id, nil
 }
+
+func (*User) TokenAuth(input InputTokenAuth, db *gorm.DB) (*UUID, error) {
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	var user User
+	if err := db.Where("id = ?", input.UserID).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("ユーザーが見つかりません")
+		}
+		return nil, err
+	}
+
+	if user.IsTokenAuthenticated {
+		return nil, fmt.Errorf("すでに認証済みです")
+	}
+
+	var signUpToken SignUpToken
+	if err := db.Where("id = ?", user.SignUpTokenId).First(&signUpToken).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("トークンが見つかりません")
+		}
+		return nil, err
+	}
+
+	if signUpToken.Token != input.Token {
+		return nil, fmt.Errorf("トークンが一致しません")
+	}
+
+	user.IsTokenAuthenticated = true
+	if err := db.Save(&user).Error; err != nil {
+		return nil, err
+	}
+
+	return &user.Id, nil
+}

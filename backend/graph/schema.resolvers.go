@@ -33,7 +33,10 @@ func (r *mutationResolver) SignUp(ctx context.Context, input model.Auth) (*model
 
 // TokenAuth is the resolver for the tokenAuth field.
 func (r *mutationResolver) TokenAuth(ctx context.Context, input model.InputTokenAuth) (*model.UUID, error) {
-	panic(fmt.Errorf("not implemented: TokenAuth - tokenAuth"))
+	db := r.DB
+	userModel := model.User{}
+	id, err := userModel.TokenAuth(input, db)
+	return id, err
 }
 
 // Login is the resolver for the login field.
