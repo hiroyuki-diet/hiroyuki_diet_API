@@ -3,8 +3,10 @@ package model
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"time"
 
+	"github.com/moXXcha/hiroyuki_diet_API/utils"
 	"gorm.io/gorm"
 )
 
@@ -67,4 +69,62 @@ func (*User) Seeder(db *gorm.DB) error {
 	}
 
 	return nil
+}
+
+func (*User) SignUp(input Auth, db *gorm.DB) (*UUID, error) {
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	tx := db.Begin()
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	var existingUser User
+	if err := tx.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
+		tx.Rollback()
+		return nil, fmt.Errorf("このメールアドレスは既に使用されています")
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// トークンの生成
+	token := rand.Intn(900000) + 100000
+	signUpToken := SignUpToken{
+		Token:       token,
+		SurviveTime: 1,
+	}
+
+	if err := tx.Create(&signUpToken).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	hashedPassword, err := utils.HashPassword(input.Password)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	user := User{
+		Email:                input.Email,
+		Password:             hashedPassword,
+		Level:                0,
+		ExperiencePoint:      0,
+		SignUpTokenId:        signUpToken.Id,
+		IsTokenAuthenticated: false,
+	}
+
+	if err := tx.Create(&user).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return nil, err
+	}
+
+	return &user.Id, nil
 }
