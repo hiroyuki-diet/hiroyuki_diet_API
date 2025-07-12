@@ -45,6 +45,11 @@ type InputProfile struct {
 	TargetDailyCarorie      int    `json:"targetDailyCarorie"`
 }
 
+type InputTokenAuth struct {
+	UserID UUID `json:"userId"`
+	Token  int  `json:"token"`
+}
+
 type InputUseItem struct {
 	UserID UUID `json:"userId"`
 	ItemID UUID `json:"itemId"`

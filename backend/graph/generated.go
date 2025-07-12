@@ -107,6 +107,7 @@ type ComplexityRoot struct {
 		PostSkin           func(childComplexity int, input model.InputPostSkin) int
 		ReceiptAchievement func(childComplexity int, input model.InputAchievement) int
 		SignUp             func(childComplexity int, input model.Auth) int
+		TokenAuth          func(childComplexity int, input model.InputTokenAuth) int
 		UseItem            func(childComplexity int, input model.InputUseItem) int
 	}
 
@@ -172,6 +173,7 @@ type FoodResolver interface {
 }
 type MutationResolver interface {
 	SignUp(ctx context.Context, input model.Auth) (*model.UUID, error)
+	TokenAuth(ctx context.Context, input model.InputTokenAuth) (*model.UUID, error)
 	Login(ctx context.Context, input model.Auth) (*string, error)
 	Logout(ctx context.Context, input model.UUID) (*model.UUID, error)
 	CreateExercise(ctx context.Context, input model.InputExercise) (*model.UUID, error)
@@ -539,6 +541,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.SignUp(childComplexity, args["input"].(model.Auth)), true
 
+	case "Mutation.tokenAuth":
+		if e.complexity.Mutation.TokenAuth == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_tokenAuth_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.TokenAuth(childComplexity, args["input"].(model.InputTokenAuth)), true
+
 	case "Mutation.useItem":
 		if e.complexity.Mutation.UseItem == nil {
 			break
@@ -856,6 +870,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputInputMeal,
 		ec.unmarshalInputInputPostSkin,
 		ec.unmarshalInputInputProfile,
+		ec.unmarshalInputInputTokenAuth,
 		ec.unmarshalInputInputUseItem,
 	)
 	first := true
@@ -1246,6 +1261,29 @@ func (ec *executionContext) field_Mutation_signUp_argsInput(
 	}
 
 	var zeroVal model.Auth
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_tokenAuth_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_tokenAuth_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_tokenAuth_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (model.InputTokenAuth, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNInputTokenAuth2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputTokenAuth(ctx, tmp)
+	}
+
+	var zeroVal model.InputTokenAuth
 	return zeroVal, nil
 }
 
@@ -2684,6 +2722,58 @@ func (ec *executionContext) fieldContext_Mutation_signUp(ctx context.Context, fi
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_signUp_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_tokenAuth(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_tokenAuth(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().TokenAuth(rctx, fc.Args["input"].(model.InputTokenAuth))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UUID)
+	fc.Result = res
+	return ec.marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_tokenAuth(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_tokenAuth_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -7530,6 +7620,40 @@ func (ec *executionContext) unmarshalInputInputProfile(ctx context.Context, obj 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputInputTokenAuth(ctx context.Context, obj any) (model.InputTokenAuth, error) {
+	var it model.InputTokenAuth
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"userId", "token"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "userId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserID = data
+		case "token":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Token = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputInputUseItem(ctx context.Context, obj any) (model.InputUseItem, error) {
 	var it model.InputUseItem
 	asMap := map[string]any{}
@@ -7992,6 +8116,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "signUp":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_signUp(ctx, field)
+			})
+		case "tokenAuth":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_tokenAuth(ctx, field)
 			})
 		case "login":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -9441,6 +9569,11 @@ func (ec *executionContext) unmarshalNInputPostSkin2githubᚗcomᚋmoXXchaᚋhir
 
 func (ec *executionContext) unmarshalNInputProfile2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputProfile(ctx context.Context, v any) (model.InputProfile, error) {
 	res, err := ec.unmarshalInputInputProfile(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNInputTokenAuth2githubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐInputTokenAuth(ctx context.Context, v any) (model.InputTokenAuth, error) {
+	res, err := ec.unmarshalInputInputTokenAuth(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
