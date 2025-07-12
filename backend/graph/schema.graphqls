@@ -41,8 +41,8 @@ type Query {
 
 type Mutation {
   signUp(input: Auth!): ID
-  tokenAuth(input: InputTokenAuth!): ID
-  login(input: Auth!): String
+  tokenAuth(input: InputTokenAuth!): JWTTokenResponse!
+  login(input: Auth!): JWTTokenResponse!
   logout(input: ID!): ID
   createExercise(input: InputExercise!): ID
   editExercise(input: InputExercise!): ID
@@ -190,4 +190,9 @@ type Food {
   name: String!
   estimateCalorie: Int!
   lastUsedDate: String!
+}
+
+type JWTTokenResponse {
+  userId: ID!
+  token: String!
 }
