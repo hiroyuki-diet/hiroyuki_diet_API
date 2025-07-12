@@ -40,7 +40,7 @@ type Query {
 }
 
 type Mutation {
-  signUp(input: Auth!): String
+  signUp(input: Auth!): ID
   login(input: Auth!): String
   logout(input: ID!): ID
   createExercise(input: InputExercise!): ID
