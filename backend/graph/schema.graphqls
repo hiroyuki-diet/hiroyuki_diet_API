@@ -40,7 +40,7 @@ type Query {
 }
 
 type Mutation {
-  signUp(input: Auth!): ID
+  signUp(input: Auth!): JWTTokenResponse
   tokenAuth(input: InputTokenAuth!): JWTTokenResponse!
   login(input: Auth!): JWTTokenResponse!
   logout(input: ID!): ID

@@ -177,7 +177,7 @@ type FoodResolver interface {
 	LastUsedDate(ctx context.Context, obj *model.Food) (string, error)
 }
 type MutationResolver interface {
-	SignUp(ctx context.Context, input model.Auth) (*model.UUID, error)
+	SignUp(ctx context.Context, input model.Auth) (*model.JWTTokenResponse, error)
 	TokenAuth(ctx context.Context, input model.InputTokenAuth) (*model.JWTTokenResponse, error)
 	Login(ctx context.Context, input model.Auth) (*model.JWTTokenResponse, error)
 	Logout(ctx context.Context, input model.UUID) (*model.UUID, error)
@@ -2806,9 +2806,9 @@ func (ec *executionContext) _Mutation_signUp(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.UUID)
+	res := resTmp.(*model.JWTTokenResponse)
 	fc.Result = res
-	return ec.marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
+	return ec.marshalOJWTTokenResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐJWTTokenResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_signUp(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2818,7 +2818,13 @@ func (ec *executionContext) fieldContext_Mutation_signUp(ctx context.Context, fi
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			switch field.Name {
+			case "userId":
+				return ec.fieldContext_JWTTokenResponse_userId(ctx, field)
+			case "token":
+				return ec.fieldContext_JWTTokenResponse_token(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type JWTTokenResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -10350,6 +10356,13 @@ func (ec *executionContext) marshalOItemResponse2ᚕᚖgithubᚗcomᚋmoXXchaᚋ
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalOJWTTokenResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐJWTTokenResponse(ctx context.Context, sel ast.SelectionSet, v *model.JWTTokenResponse) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._JWTTokenResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOMeal2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMealᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Meal) graphql.Marshaler {
