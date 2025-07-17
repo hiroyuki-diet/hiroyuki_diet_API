@@ -1,16 +1,22 @@
 # Hiroyuki Diet API
 
-ひろゆきメーカーのAPIです。
+ひろゆきダイエットの API です。
 
 ## 目次
 
-- [必要要件](#必要要件)
-- [起動方法](#起動方法)
-- [APIエンドポイント](#apiエンドポイント)
-- [GraphQL Playground](#graphql-playground)
-- [GraphQLスキーマ](#graphqlスキーマ)
-- [シーダーの実行方法](#シーダーの実行方法)
-- [データベース構造](#データベース構造)
+- [Hiroyuki Diet API](#hiroyuki-diet-api)
+  - [目次](#目次)
+  - [必要要件](#必要要件)
+  - [起動方法](#起動方法)
+  - [API エンドポイント](#apiエンドポイント)
+  - [GraphQL Playground](#graphql-playground)
+    - [Playground でのテスト例](#playgroundでのテスト例)
+      - [1. ユーザー登録 (SignUp)](#1-ユーザー登録-signup)
+      - [2. ログイン (Login)](#2-ログイン-login)
+      - [3. ユーザー情報の取得 (認証が必要)](#3-ユーザー情報の取得-認証が必要)
+  - [GraphQL スキーマ](#graphqlスキーマ)
+  - [シーダーの実行方法](#シーダーの実行方法)
+  - [データベース構造](#データベース構造)
 
 ## 必要要件
 
@@ -19,26 +25,26 @@
 
 ## 起動方法
 
-以下のコマンドを実行すると、APIサーバーとデータベースが起動します。
+以下のコマンドを実行すると、API サーバーとデータベースが起動します。
 
 ```bash
 docker-compose up -d --build
 ```
 
-- APIサーバー: `localhost:8080`
+- API サーバー: `localhost:8080`
 - PostgreSQL: `localhost:5432`
 
-## APIエンドポイント
+## API エンドポイント
 
 - **GraphQL API**: `http://localhost:8080/query`
 - **GraphQL Playground**: `http://localhost:8080/`
 
 ## GraphQL Playground
 
-`http://localhost:8080/` にアクセスすると、GraphQL Playgroundが利用できます。
-Playground上で直接クエリやミューテーションを実行し、APIの動作を確認できます。
+`http://localhost:8080/` にアクセスすると、GraphQL Playground が利用できます。
+Playground 上で直接クエリやミューテーションを実行し、API の動作を確認できます。
 
-### Playgroundでのテスト例
+### Playground でのテスト例
 
 #### 1. ユーザー登録 (SignUp)
 
@@ -64,9 +70,10 @@ mutation {
 
 #### 3. ユーザー情報の取得 (認証が必要)
 
-ログイン後に取得した`token`を、HTTPヘッダーに設定して実行します。
+ログイン後に取得した`token`を、HTTP ヘッダーに設定して実行します。
 
 **HTTP HEADERS**
+
 ```json
 {
   "Authorization": "Bearer YOUR_JWT_TOKEN"
@@ -74,6 +81,7 @@ mutation {
 ```
 
 **Query**
+
 ```graphql
 query {
   user(id: "YOUR_USER_ID") {
@@ -88,7 +96,7 @@ query {
 }
 ```
 
-## GraphQLスキーマ
+## GraphQL スキーマ
 
 <details>
 <summary>schema.graphqlsを見る</summary>
@@ -200,7 +208,6 @@ input InputMeal {
   foods: [ID!]!
 }
 
-
 type User {
   id: ID!
   email: String!
@@ -211,7 +218,7 @@ type User {
   experiencePoInt: Int!
   exercisies(offset: String!, limit: String!): [Exercise!]
   meals: [Meal!]
-  meal(id: ID!): Meal! 
+  meal(id: ID!): Meal!
   items: [ItemResponse!]
   hiroyukiSkins(usingSkin: Boolean!): [SkinResponse!]!
   achievements: [AchievementResponse!]!
@@ -284,7 +291,6 @@ type Profile {
   favorability: Int
 }
 
-
 type Food {
   id: ID!
   name: String!
@@ -297,6 +303,7 @@ type JWTTokenResponse {
   token: String!
 }
 ```
+
 </details>
 
 ## シーダーの実行方法
@@ -307,11 +314,13 @@ type JWTTokenResponse {
 もし手動でシーダーを実行したい場合は、以下の手順で行います。
 
 1.  実行中の`backend`コンテナに入る
+
     ```bash
     docker-compose exec backend /bin/sh
     ```
 
 2.  `seeder`ディレクトリに移動する
+
     ```bash
     cd seeder
     ```
@@ -323,8 +332,8 @@ type JWTTokenResponse {
 
 ## データベース構造
 
-このプロジェクトではPostgreSQLを使用しています。
-GORMによって、モデル定義に基づいたテーブルが自動的に作成されます。主要なテーブル間の関連は以下の通りです。
+このプロジェクトでは PostgreSQL を使用しています。
+GORM によって、モデル定義に基づいたテーブルが自動的に作成されます。主要なテーブル間の関連は以下の通りです。
 
 <details>
 <summary>ER図を見る</summary>
