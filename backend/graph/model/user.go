@@ -31,7 +31,7 @@ func (*User) GetInfo(id UUID, db *gorm.DB) (*User, error) {
 		return nil, fmt.Errorf("db is nil")
 	}
 
-	result := db.Preload("SignUpToken").First(&user)
+	result := db.Preload("SignUpToken").Where("id = ?", id).First(&user)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -229,6 +229,7 @@ func (*User) Login(input Auth, db *gorm.DB) (*JWTTokenResponse, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate JWT: %w", err)
 	}
+	fmt.Println(token)
 
 	return &JWTTokenResponse{
 		UserId: user.Id,
