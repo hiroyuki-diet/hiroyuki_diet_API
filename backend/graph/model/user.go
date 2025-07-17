@@ -31,7 +31,7 @@ func (*User) GetInfo(id UUID, db *gorm.DB) (*User, error) {
 		return nil, fmt.Errorf("db is nil")
 	}
 
-	result := db.Preload("SignUpToken").First(&user)
+	result := db.Preload("SignUpToken").Where("id = ?", id).First(&user)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -71,7 +71,7 @@ func (*User) Seeder(db *gorm.DB) error {
 	return nil
 }
 
-func (*User) SignUp(input Auth, db *gorm.DB) (*UUID, error) {
+func (*User) SignUp(input Auth, db *gorm.DB) (*JWTTokenResponse, error) {
 	if db == nil {
 		return nil, fmt.Errorf("db is nil")
 	}
@@ -126,7 +126,16 @@ func (*User) SignUp(input Auth, db *gorm.DB) (*UUID, error) {
 		return nil, err
 	}
 
-	return &user.Id, nil
+	jwt, err := utils.GenerateJWT(user.Id.String(), user.IsTokenAuthenticated, time.Hour*24)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate JWT: %w", err)
+	}
+
+	return &JWTTokenResponse{
+		UserId: user.Id,
+		Token:  jwt,
+	}, nil
+
 }
 
 func (*User) TokenAuth(input InputTokenAuth, db *gorm.DB) (*JWTTokenResponse, error) {
@@ -197,4 +206,33 @@ func (*User) TokenAuth(input InputTokenAuth, db *gorm.DB) (*JWTTokenResponse, er
 	}
 
 	return &tokenResponse, nil
+}
+
+func (*User) Login(input Auth, db *gorm.DB) (*JWTTokenResponse, error) {
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	var user User
+	if err := db.Where("email = ?", input.Email).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("メールアドレスまたはパスワードが正しくありません")
+		}
+		return nil, err
+	}
+
+	if err := utils.ComparePassword(user.Password, input.Password); err != nil {
+		return nil, fmt.Errorf("メールアドレスまたはパスワードが正しくありません")
+	}
+
+	token, err := utils.GenerateJWT(user.Id.String(), user.IsTokenAuthenticated, time.Hour*24)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate JWT: %w", err)
+	}
+	fmt.Println(token)
+
+	return &JWTTokenResponse{
+		UserId: user.Id,
+		Token:  token,
+	}, nil
 }

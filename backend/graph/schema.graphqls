@@ -1,6 +1,8 @@
 # GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
+directive @auth on FIELD_DEFINITION
+
 enum FieldEnum {
   login
   signin
@@ -35,25 +37,25 @@ enum GenderEnum {
   woman
 }
 type Query {
-  user(id: ID!): User!
-  foods: [Food!]!
+  user(id: ID!): User! @auth
+  foods: [Food!]! @auth
 }
 
 type Mutation {
-  signUp(input: Auth!): ID
-  tokenAuth(input: InputTokenAuth!): JWTTokenResponse!
+  signUp(input: Auth!): JWTTokenResponse
+  tokenAuth(input: InputTokenAuth!): JWTTokenResponse! @auth
   login(input: Auth!): JWTTokenResponse!
-  logout(input: ID!): ID
-  createExercise(input: InputExercise!): ID
-  editExercise(input: InputExercise!): ID
-  receiptAchievement(input: InputAchievement!): ID
-  createProfile(input: InputProfile!): ID
-  editProfile(input: InputProfile!): ID
-  createMeal(input: InputMeal!): ID
-  editMeal(input: InputMeal!): ID
-  deleteMeal(input: ID!): ID
-  postSkin(input: InputPostSkin!): ID
-  useItem(input: InputUseItem!): ID
+  logout(input: ID!): ID @auth
+  createExercise(input: InputExercise!): ID @auth
+  editExercise(input: InputExercise!): ID @auth
+  receiptAchievement(input: InputAchievement!): ID @auth
+  createProfile(input: InputProfile!): ID @auth
+  editProfile(input: InputProfile!): ID @auth
+  createMeal(input: InputMeal!): ID @auth
+  editMeal(input: InputMeal!): ID @auth
+  deleteMeal(input: ID!): ID @auth
+  postSkin(input: InputPostSkin!): ID @auth
+  useItem(input: InputUseItem!): ID @auth
 }
 input InputUseItem {
   userId: ID!

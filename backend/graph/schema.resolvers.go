@@ -24,11 +24,11 @@ func (r *foodResolver) LastUsedDate(ctx context.Context, obj *model.Food) (strin
 }
 
 // SignUp is the resolver for the signUp field.
-func (r *mutationResolver) SignUp(ctx context.Context, input model.Auth) (*model.UUID, error) {
+func (r *mutationResolver) SignUp(ctx context.Context, input model.Auth) (*model.JWTTokenResponse, error) {
 	db := r.DB
 	userModel := model.User{}
-	id, err := userModel.SignUp(input, db)
-	return id, err
+	jwt, err := userModel.SignUp(input, db)
+	return jwt, err
 }
 
 // TokenAuth is the resolver for the tokenAuth field.
@@ -41,7 +41,9 @@ func (r *mutationResolver) TokenAuth(ctx context.Context, input model.InputToken
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input model.Auth) (*model.JWTTokenResponse, error) {
-	panic(fmt.Errorf("not implemented: Login - login"))
+	db := r.DB
+	userModel := model.User{}
+	return userModel.Login(input, db)
 }
 
 // Logout is the resolver for the logout field.

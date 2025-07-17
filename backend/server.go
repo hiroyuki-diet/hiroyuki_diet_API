@@ -12,6 +12,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/moXXcha/hiroyuki_diet_API/graph"
+	"github.com/moXXcha/hiroyuki_diet_API/graph/middleware"
 	"github.com/moXXcha/hiroyuki_diet_API/graph/model"
 	"github.com/moXXcha/hiroyuki_diet_API/utils"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -77,7 +78,12 @@ func main() {
 
 	fmt.Println("db initialized")
 
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{resolver.DB}}))
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{
+		Resolvers: &graph.Resolver{resolver.DB},
+		Directives: graph.DirectiveRoot{
+			Auth: graph.Auth,
+		},
+	}))
 
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
@@ -91,27 +97,8 @@ func main() {
 	})
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", corsMiddleware(srv))
+	http.Handle("/query", middleware.AuthMiddleware(middleware.CorsMiddleware(srv)))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
-}
-
-func corsMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// CORS ヘッダーを追加
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-
-		// プリフライトリクエスト対応
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		// 本来の処理へ
-		next.ServeHTTP(w, r)
-	})
 }
