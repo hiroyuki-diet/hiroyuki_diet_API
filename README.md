@@ -8,13 +8,13 @@
   - [目次](#目次)
   - [必要要件](#必要要件)
   - [起動方法](#起動方法)
-  - [API エンドポイント](#apiエンドポイント)
+  - [API エンドポイント](#api-エンドポイント)
   - [GraphQL Playground](#graphql-playground)
-    - [Playground でのテスト例](#playgroundでのテスト例)
+    - [Playground でのテスト例](#playground-でのテスト例)
       - [1. ユーザー登録 (SignUp)](#1-ユーザー登録-signup)
       - [2. ログイン (Login)](#2-ログイン-login)
       - [3. ユーザー情報の取得 (認証が必要)](#3-ユーザー情報の取得-認証が必要)
-  - [GraphQL スキーマ](#graphqlスキーマ)
+  - [GraphQL スキーマ](#graphql-スキーマ)
   - [シーダーの実行方法](#シーダーの実行方法)
   - [データベース構造](#データベース構造)
 
@@ -315,8 +315,8 @@ type JWTTokenResponse {
 
 1.  実行中の`backend`コンテナに入る
 
-    ```bash
-    docker-compose exec backend /bin/sh
+    ```sh
+    docker exec -it hiroyuki_diet_app sh
     ```
 
 2.  `seeder`ディレクトリに移動する
