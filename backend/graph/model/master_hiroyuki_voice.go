@@ -1,7 +1,11 @@
 package model
 
 import (
+	"encoding/csv"
 	"fmt"
+	"io"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/moXXcha/hiroyuki_diet_API/utils"
@@ -70,24 +74,67 @@ func (*MasterHiroyukiVoice) GetVoices(id UUID, fields []utils.Field, db *gorm.DB
 
 func (*MasterHiroyukiVoice) FirstCreate(db *gorm.DB) error {
 	return db.Transaction(func(tx *gorm.DB) error {
-		var fields []MasterField
-		fieldsStr := []string{"home", "chibi_hiroyuki"}
+		// 既にデータが存在する場合は処理をスキップ
+		var count int64
+		tx.Model(&MasterHiroyukiVoice{}).Count(&count)
+		if count > 0 {
+			return nil
+		}
 
-		if err := tx.Where("field IN ?", fieldsStr).Find(&fields).Error; err != nil {
+		// CSVファイルを開く
+		file, err := os.Open("seeder/master_voice.csv")
+		if err != nil {
+			// docker-composeからの実行パスを考慮
+			file, err = os.Open("backend/seeder/master_voice.csv")
+			if err != nil {
+				return fmt.Errorf("failed to open master_voice.csv: %w", err)
+			}
+		}
+		defer file.Close()
+
+		reader := csv.NewReader(file)
+		reader.Read() // ヘッダー行をスキップ
+
+		// MasterFieldを事前にすべて取得しておく
+		var masterFields []MasterField
+		if err := tx.Find(&masterFields).Error; err != nil {
 			return err
 		}
-
-		voicies := []MasterHiroyukiVoice{
-			{
-				Name:         "よろしく",
-				VoiceUrl:     "",
-				ReleaseLevel: 0,
-				VoiceFields:  fields,
-			},
+		// Field名をキーにしたマップを作成
+		fieldMap := make(map[string]MasterField)
+		for _, mf := range masterFields {
+			fieldMap[string(mf.Field)] = mf
 		}
 
-		for i := range voicies {
-			if err := tx.FirstOrCreate(&voicies[i], MasterHiroyukiVoice{Name: voicies[i].Name}).Error; err != nil {
+		for {
+			record, err := reader.Read()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				return err
+			}
+
+			releaseLevel, err := strconv.Atoi(record[2])
+			if err != nil {
+				return err
+			}
+
+			fieldName := record[3]
+			field, ok := fieldMap[fieldName]
+			if !ok {
+				return fmt.Errorf("field not found: %s", fieldName)
+			}
+
+			voice := MasterHiroyukiVoice{
+				Name:         record[0],
+				VoiceUrl:     record[1],
+				ReleaseLevel: releaseLevel,
+				VoiceFields:  []MasterField{field}, // 関連付け
+			}
+
+			// 同じ名前のデータが存在しない場合のみ作成
+			if err := tx.FirstOrCreate(&voice, MasterHiroyukiVoice{Name: voice.Name}).Error; err != nil {
 				return err
 			}
 		}

@@ -1,7 +1,10 @@
 package model
 
 import (
+	"encoding/csv"
 	"fmt"
+	"io"
+	"os"
 	"time"
 
 	"gorm.io/gorm"
@@ -18,19 +21,43 @@ type MasterAchievement struct {
 
 func (*MasterAchievement) FirstCreate(db *gorm.DB) error {
 	return db.Transaction(func(tx *gorm.DB) error {
-		achievements := []MasterAchievement{
-			{
-				Name:        "初ログイン",
-				Description: "初回ログイン達成実績",
-			},
-			{
-				Name:        "レベル5達成",
-				Description: "レベル5達成実績",
-			},
+		// 既にデータが存在する場合は処理をスキップ
+		var count int64
+		tx.Model(&MasterAchievement{}).Count(&count)
+		if count > 0 {
+			return nil
 		}
 
-		for i := range achievements {
-			if err := tx.FirstOrCreate(&achievements[i], MasterAchievement{Name: achievements[i].Name}).Error; err != nil {
+		// CSVファイルを開く
+		file, err := os.Open("seeder/master_achievement.csv")
+		if err != nil {
+			// docker-composeからの実行パスを考慮
+			file, err = os.Open("backend/seeder/master_achievement.csv")
+			if err != nil {
+				return fmt.Errorf("failed to open master_achievement.csv: %w", err)
+			}
+		}
+		defer file.Close()
+
+		reader := csv.NewReader(file)
+		reader.Read() // ヘッダー行をスキップ
+
+		for {
+			record, err := reader.Read()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				return err
+			}
+
+			achievement := MasterAchievement{
+				Name:        record[0],
+				Description: record[1],
+			}
+
+			// 同じ名前のデータが存在しない場合のみ作成
+			if err := tx.FirstOrCreate(&achievement, MasterAchievement{Name: achievement.Name}).Error; err != nil {
 				return err
 			}
 		}
