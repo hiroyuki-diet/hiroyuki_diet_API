@@ -1,116 +1,104 @@
-# hiroyuki_diet_API
+# Hiroyuki Diet API
 
-## プロジェクト概要
+ひろゆきメーカーのAPIです。
 
-このプロジェクトは、ひろゆき氏のダイエットをテーマにしたアプリケーションのバックエンド API です。GraphQL を採用しており、ユーザー管理、食事記録、運動記録、アチーブメント、アイテム、スキン、ボイスなどの機能を提供します。
+## 目次
 
-## 特徴
+- [必要要件](#必要要件)
+- [起動方法](#起動方法)
+- [APIエンドポイント](#apiエンドポイント)
+- [GraphQL Playground](#graphql-playground)
+- [GraphQLスキーマ](#graphqlスキーマ)
+- [シーダーの実行方法](#シーダーの実行方法)
+- [データベース構造](#データベース構造)
 
-- **GraphQL API**: `gqlgen` を使用した強力な型付けされた API。
-- **ユーザー認証**: JWT (JSON Web Token) を利用したセキュアな認証システム。
-- **データベース**: PostgreSQL を利用し、`GORM` で ORM を実装。
-- **Docker 対応**: 開発環境の構築が容易。
-- **パスワードハッシュ化**: `bcrypt` による安全なパスワード保存。
+## 必要要件
 
-## 使用技術
+- Docker
+- Docker Compose
 
-- **Go**: バックエンド言語
-- **GraphQL**: API クエリ言語
-- **gqlgen**: Go 言語用 GraphQL サーバーフレームワーク
-- **GORM**: Go 言語用 ORM ライブラリ
-- **PostgreSQL**: データベース
-- **Docker / Docker Compose**: 開発環境構築
-- **JWT**: 認証トークン
-- **bcrypt**: パスワードハッシュ化
+## 起動方法
 
-## セットアップ
-
-### 前提条件
-
-- [Go](https://golang.org/doc/install) (バージョン 1.16 以上推奨)
-- [Docker](https://docs.docker.com/get-docker/) および [Docker Compose](https://docs.docker.com/compose/install/)
-
-### 1. リポジトリのクローン
+以下のコマンドを実行すると、APIサーバーとデータベースが起動します。
 
 ```bash
-git clone https://github.com/moXXcha/hiroyuki_diet_API.git
-cd hiroyuki_diet_API
+docker-compose up -d --build
 ```
 
-### 2. 環境変数の設定
+- APIサーバー: `localhost:8080`
+- PostgreSQL: `localhost:5432`
 
-プロジェクトのルートディレクトリに `.env` ファイルを作成し、以下の内容を記述してください。
+## APIエンドポイント
 
-```dotenv
-# PostgreSQL データベース設定
-POSTGRES_HOST=db
-POSTGRES_PORT=5432
+- **GraphQL API**: `http://localhost:8080/query`
+- **GraphQL Playground**: `http://localhost:8080/`
 
-# JWT シークレットキー (任意の強力な文字列を設定してください)
-JWT_SECRET_KEY=your_super_secret_jwt_key_here
+## GraphQL Playground
 
-# アプリケーションポート
-PORT=8080
+`http://localhost:8080/` にアクセスすると、GraphQL Playgroundが利用できます。
+Playground上で直接クエリやミューテーションを実行し、APIの動作を確認できます。
+
+### Playgroundでのテスト例
+
+#### 1. ユーザー登録 (SignUp)
+
+```graphql
+mutation {
+  signUp(input: { email: "test@example.com", password: "password123" }) {
+    userId
+    token
+  }
+}
 ```
 
-### 3. データベースのセットアップ
+#### 2. ログイン (Login)
 
-Docker Compose を使用して PostgreSQL コンテナを起動し、データベースを初期化します。
-
-```bash
-docker-compose up -d db
+```graphql
+mutation {
+  login(input: { email: "test@example.com", password: "password123" }) {
+    userId
+    token
+  }
+}
 ```
 
-データベースの初期化スクリプト (`init.sql`) が自動的に実行されます。
+#### 3. ユーザー情報の取得 (認証が必要)
 
-### 4. Go モジュールのインストール
+ログイン後に取得した`token`を、HTTPヘッダーに設定して実行します。
 
-`backend` ディレクトリに移動し、必要な Go モジュールをインストールします。
-
-```bash
-cd backend
-go mod tidy
+**HTTP HEADERS**
+```json
+{
+  "Authorization": "Bearer YOUR_JWT_TOKEN"
+}
 ```
 
-### 5. アプリケーションの実行
-
-`backend` ディレクトリからアプリケーションを起動します。
-
-```bash
-go run server.go
+**Query**
+```graphql
+query {
+  user(id: "YOUR_USER_ID") {
+    id
+    email
+    level
+    profile {
+      userName
+      age
+    }
+  }
+}
 ```
 
-または、Docker Compose を使用してすべてのサービスを起動することもできます。
+## GraphQLスキーマ
 
-```bash
-docker-compose up -d
-```
-
-アプリケーションはデフォルトで `http://localhost:8080` で起動します。
-
-#### Docker コンテナ内での作業
-
-アプリケーションが Docker コンテナ内で実行されている場合、以下のコマンドでコンテナのシェルに入ることができます。
-
-```bash
-docker-compose exec container_name: hiroyuki_diet_app sh
-```
-
-コンテナ内で Go コマンドを実行したり、ログを確認したりする際に便利です。
-
-## GraphQL スキーマ
-
-GraphQL Playground にアクセスすると、API スキーマをインタラクティブに探索できます。
-
-**GraphQL Playground URL**: `http://localhost:8080/`
-**GraphQL API エンドポイント**: `http://localhost:8080/query`
-
-### スキーマ定義 (`backend/graph/schema.graphqls`)
+<details>
+<summary>schema.graphqlsを見る</summary>
 
 ```graphql
 # GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
+directive @auth on FIELD_DEFINITION
+
 enum FieldEnum {
   login
   signin
@@ -145,25 +133,25 @@ enum GenderEnum {
   woman
 }
 type Query {
-  user(id: ID!): User!
-  foods: [Food!]!
+  user(id: ID!): User! @auth
+  foods: [Food!]! @auth
 }
 
 type Mutation {
-  signUp(input: Auth!): ID
-  tokenAuth(input: InputTokenAuth!): JWTTokenResponse!
+  signUp(input: Auth!): JWTTokenResponse
+  tokenAuth(input: InputTokenAuth!): JWTTokenResponse! @auth
   login(input: Auth!): JWTTokenResponse!
-  logout(input: ID!): ID
-  createExercise(input: InputExercise!): ID
-  editExercise(input: InputExercise!): ID
-  receiptAchievement(input: InputAchievement!): ID
-  createProfile(input: InputProfile!): ID
-  editProfile(input: InputProfile!): ID
-  createMeal(input: InputMeal!): ID
-  editMeal(input: InputMeal!): ID
-  deleteMeal(input: ID!): ID
-  postSkin(input: InputPostSkin!): ID
-  useItem(input: InputUseItem!): ID
+  logout(input: ID!): ID @auth
+  createExercise(input: InputExercise!): ID @auth
+  editExercise(input: InputExercise!): ID @auth
+  receiptAchievement(input: InputAchievement!): ID @auth
+  createProfile(input: InputProfile!): ID @auth
+  editProfile(input: InputProfile!): ID @auth
+  createMeal(input: InputMeal!): ID @auth
+  editMeal(input: InputMeal!): ID @auth
+  deleteMeal(input: ID!): ID @auth
+  postSkin(input: InputPostSkin!): ID @auth
+  useItem(input: InputUseItem!): ID @auth
 }
 input InputUseItem {
   userId: ID!
@@ -212,6 +200,7 @@ input InputMeal {
   foods: [ID!]!
 }
 
+
 type User {
   id: ID!
   email: String!
@@ -222,8 +211,8 @@ type User {
   experiencePoInt: Int!
   exercisies(offset: String!, limit: String!): [Exercise!]
   meals: [Meal!]
-  meal(id: ID!): Meal!
-  items: [ItemResponse!]!
+  meal(id: ID!): Meal! 
+  items: [ItemResponse!]
   hiroyukiSkins(usingSkin: Boolean!): [SkinResponse!]!
   achievements: [AchievementResponse!]!
   hiroyukiVoicies(fields: [FieldEnum!]!): [HiroyukiVoiceResponse!]!
@@ -295,6 +284,7 @@ type Profile {
   favorability: Int
 }
 
+
 type Food {
   id: ID!
   name: String!
@@ -307,57 +297,124 @@ type JWTTokenResponse {
   token: String!
 }
 ```
+</details>
 
-## API 利用例
+## シーダーの実行方法
 
-### ユーザー登録 (signUp)
+マスターデータをデータベースに投入するためのシーダーが用意されています。
+`FirstCreate`メソッドが各モデルに実装されており、アプリケーションの起動時に自動で実行されます。
 
-```graphql
-mutation {
-  signUp(input: { email: "test@example.com", password: "password123" })
-}
-```
+もし手動でシーダーを実行したい場合は、以下の手順で行います。
 
-### トークン認証 (tokenAuth)
+1.  実行中の`backend`コンテナに入る
+    ```bash
+    docker-compose exec backend /bin/sh
+    ```
 
-`signUp`後に返されるユーザー ID と、登録時に生成されたトークン（通常はメールなどでユーザーに通知される）を使用します。
+2.  `seeder`ディレクトリに移動する
+    ```bash
+    cd seeder
+    ```
 
-```graphql
-mutation {
-  tokenAuth(input: { userId: "[signUpで返されたID]", token: 123456 }) {
-    userId
-    token
-  }
-}
-```
+3.  シーダープログラムを実行する
+    ```bash
+    go run main.go
+    ```
 
-### ログイン (login)
+## データベース構造
 
-```graphql
-mutation {
-  login(input: { email: "test@example.com", password: "password123" }) {
-    userId
-    token
-  }
-}
-```
+このプロジェクトではPostgreSQLを使用しています。
+GORMによって、モデル定義に基づいたテーブルが自動的に作成されます。主要なテーブル間の関連は以下の通りです。
 
-### ユーザー情報取得 (user) - 認証が必要な例
+<details>
+<summary>ER図を見る</summary>
 
-このクエリを実行する際は、HTTP ヘッダーに認証トークンを含める必要があります。
-
-**HTTP Headers:**
-`Authorization: Bearer [loginまたはtokenAuthで返されたJWTトークン]`
-
-```graphql
-query {
-  user(id: "[ユーザーのID]") {
-    id
-    email
-    level
-    profile {
-      userName
+```mermaid
+erDiagram
+    USER {
+        UUID Id PK
+        string Email
     }
-  }
-}
+    PROFILE {
+        UUID Id PK
+        UUID UserId FK
+    }
+    EXERCISE {
+        UUID Id PK
+        UUID UserId FK
+    }
+    MEAL {
+        UUID Id PK
+        UUID UserId FK
+    }
+    FOOD {
+        UUID Id PK
+        string Name
+    }
+    FOOD_MEALS {
+        UUID MealId PK,FK
+        UUID FoodId PK,FK
+    }
+    MASTER_ACHIEVEMENT {
+        UUID Id PK
+        string Name
+    }
+    USER_ACHIEVEMENT {
+        UUID Id PK
+        UUID UserId FK
+        UUID AchievementId FK
+    }
+    MASTER_ITEM {
+        UUID Id PK
+        string Name
+    }
+    USER_ITEM {
+        UUID Id PK
+        UUID UserId FK
+        UUID ItemId FK
+    }
+    MASTER_HIROYUKI_SKIN {
+        UUID Id PK
+        string Name
+    }
+    USER_SKIN {
+        UUID Id PK
+        UUID UserId FK
+        UUID SkinId FK
+    }
+    MASTER_HIROYUKI_VOICE {
+        UUID Id PK
+        string Name
+    }
+    USER_HIROYUKI_VOICE {
+        UUID Id PK
+        UUID UserId FK
+        UUID VoiceId FK
+    }
+    MASTER_FIELD {
+        UUID Id PK
+        string Field
+    }
+    VOICE_FIELDS {
+        UUID MasterHiroyukiVoiceId PK,FK
+        UUID MasterFieldId PK,FK
+    }
+
+    USER ||--o{ PROFILE : "has"
+    USER ||--|{ EXERCISE : "records"
+    USER ||--|{ MEAL : "records"
+    USER ||--|{ USER_ACHIEVEMENT : "earns"
+    MASTER_ACHIEVEMENT ||--|{ USER_ACHIEVEMENT : "is"
+    USER ||--|{ USER_ITEM : "has"
+    MASTER_ITEM ||--|{ USER_ITEM : "is"
+    USER ||--|{ USER_SKIN : "has"
+    MASTER_HIROYUKI_SKIN ||--|{ USER_SKIN : "is"
+    USER ||--|{ USER_HIROYUKI_VOICE : "has"
+    MASTER_HIROYUKI_VOICE ||--|{ USER_HIROYUKI_VOICE : "is"
+    MEAL ||--|{ FOOD_MEALS : "details"
+    FOOD ||--|{ FOOD_MEALS : "details"
+    MASTER_HIROYUKI_VOICE ||--|{ VOICE_FIELDS : "is_for"
+    MASTER_FIELD ||--|{ VOICE_FIELDS : "is_for"
 ```
+
+</details>
