@@ -117,6 +117,10 @@ type ComplexityRoot struct {
 		UseItem            func(childComplexity int, input model.InputUseItem) int
 	}
 
+	MutationSuccessResponse struct {
+		ID func(childComplexity int) int
+	}
+
 	Profile struct {
 		Age                     func(childComplexity int) int
 		Favorability            func(childComplexity int) int
@@ -181,17 +185,17 @@ type MutationResolver interface {
 	SignUp(ctx context.Context, input model.Auth) (*model.JWTTokenResponse, error)
 	TokenAuth(ctx context.Context, input model.InputTokenAuth) (*model.JWTTokenResponse, error)
 	Login(ctx context.Context, input model.Auth) (*model.JWTTokenResponse, error)
-	Logout(ctx context.Context, input model.UUID) (*model.UUID, error)
-	CreateExercise(ctx context.Context, input model.InputExercise) (*model.UUID, error)
-	EditExercise(ctx context.Context, input model.InputExercise) (*model.UUID, error)
-	ReceiptAchievement(ctx context.Context, input model.InputAchievement) (*model.UUID, error)
-	CreateProfile(ctx context.Context, input model.InputProfile) (*model.UUID, error)
-	EditProfile(ctx context.Context, input model.InputProfile) (*model.UUID, error)
-	CreateMeal(ctx context.Context, input model.InputMeal) (*model.UUID, error)
-	EditMeal(ctx context.Context, input model.InputMeal) (*model.UUID, error)
-	DeleteMeal(ctx context.Context, input model.UUID) (*model.UUID, error)
-	PostSkin(ctx context.Context, input model.InputPostSkin) (*model.UUID, error)
-	UseItem(ctx context.Context, input model.InputUseItem) (*model.UUID, error)
+	Logout(ctx context.Context, input model.UUID) (*model.MutationSuccessResponse, error)
+	CreateExercise(ctx context.Context, input model.InputExercise) (*model.MutationSuccessResponse, error)
+	EditExercise(ctx context.Context, input model.InputExercise) (*model.MutationSuccessResponse, error)
+	ReceiptAchievement(ctx context.Context, input model.InputAchievement) (*model.MutationSuccessResponse, error)
+	CreateProfile(ctx context.Context, input model.InputProfile) (*model.MutationSuccessResponse, error)
+	EditProfile(ctx context.Context, input model.InputProfile) (*model.MutationSuccessResponse, error)
+	CreateMeal(ctx context.Context, input model.InputMeal) (*model.MutationSuccessResponse, error)
+	EditMeal(ctx context.Context, input model.InputMeal) (*model.MutationSuccessResponse, error)
+	DeleteMeal(ctx context.Context, input model.UUID) (*model.MutationSuccessResponse, error)
+	PostSkin(ctx context.Context, input model.InputPostSkin) (*model.MutationSuccessResponse, error)
+	UseItem(ctx context.Context, input model.InputUseItem) (*model.MutationSuccessResponse, error)
 }
 type QueryResolver interface {
 	User(ctx context.Context, id model.UUID) (*model.User, error)
@@ -584,6 +588,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.UseItem(childComplexity, args["input"].(model.InputUseItem)), true
+
+	case "MutationSuccessResponse.id":
+		if e.complexity.MutationSuccessResponse.ID == nil {
+			break
+		}
+
+		return e.complexity.MutationSuccessResponse.ID(childComplexity), true
 
 	case "Profile.age":
 		if e.complexity.Profile.Age == nil {
@@ -3006,7 +3017,7 @@ func (ec *executionContext) _Mutation_logout(ctx context.Context, field graphql.
 
 		directive1 := func(ctx context.Context) (any, error) {
 			if ec.directives.Auth == nil {
-				var zeroVal *model.UUID
+				var zeroVal *model.MutationSuccessResponse
 				return zeroVal, errors.New("directive auth is not implemented")
 			}
 			return ec.directives.Auth(ctx, nil, directive0)
@@ -3019,10 +3030,10 @@ func (ec *executionContext) _Mutation_logout(ctx context.Context, field graphql.
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*model.UUID); ok {
+		if data, ok := tmp.(*model.MutationSuccessResponse); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.UUID`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.MutationSuccessResponse`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3031,9 +3042,9 @@ func (ec *executionContext) _Mutation_logout(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.UUID)
+	res := resTmp.(*model.MutationSuccessResponse)
 	fc.Result = res
-	return ec.marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
+	return ec.marshalOMutationSuccessResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMutationSuccessResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_logout(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3043,7 +3054,11 @@ func (ec *executionContext) fieldContext_Mutation_logout(ctx context.Context, fi
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MutationSuccessResponse_id(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MutationSuccessResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -3080,7 +3095,7 @@ func (ec *executionContext) _Mutation_createExercise(ctx context.Context, field 
 
 		directive1 := func(ctx context.Context) (any, error) {
 			if ec.directives.Auth == nil {
-				var zeroVal *model.UUID
+				var zeroVal *model.MutationSuccessResponse
 				return zeroVal, errors.New("directive auth is not implemented")
 			}
 			return ec.directives.Auth(ctx, nil, directive0)
@@ -3093,10 +3108,10 @@ func (ec *executionContext) _Mutation_createExercise(ctx context.Context, field 
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*model.UUID); ok {
+		if data, ok := tmp.(*model.MutationSuccessResponse); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.UUID`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.MutationSuccessResponse`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3105,9 +3120,9 @@ func (ec *executionContext) _Mutation_createExercise(ctx context.Context, field 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.UUID)
+	res := resTmp.(*model.MutationSuccessResponse)
 	fc.Result = res
-	return ec.marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
+	return ec.marshalOMutationSuccessResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMutationSuccessResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createExercise(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3117,7 +3132,11 @@ func (ec *executionContext) fieldContext_Mutation_createExercise(ctx context.Con
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MutationSuccessResponse_id(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MutationSuccessResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -3154,7 +3173,7 @@ func (ec *executionContext) _Mutation_editExercise(ctx context.Context, field gr
 
 		directive1 := func(ctx context.Context) (any, error) {
 			if ec.directives.Auth == nil {
-				var zeroVal *model.UUID
+				var zeroVal *model.MutationSuccessResponse
 				return zeroVal, errors.New("directive auth is not implemented")
 			}
 			return ec.directives.Auth(ctx, nil, directive0)
@@ -3167,10 +3186,10 @@ func (ec *executionContext) _Mutation_editExercise(ctx context.Context, field gr
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*model.UUID); ok {
+		if data, ok := tmp.(*model.MutationSuccessResponse); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.UUID`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.MutationSuccessResponse`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3179,9 +3198,9 @@ func (ec *executionContext) _Mutation_editExercise(ctx context.Context, field gr
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.UUID)
+	res := resTmp.(*model.MutationSuccessResponse)
 	fc.Result = res
-	return ec.marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
+	return ec.marshalOMutationSuccessResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMutationSuccessResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_editExercise(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3191,7 +3210,11 @@ func (ec *executionContext) fieldContext_Mutation_editExercise(ctx context.Conte
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MutationSuccessResponse_id(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MutationSuccessResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -3228,7 +3251,7 @@ func (ec *executionContext) _Mutation_receiptAchievement(ctx context.Context, fi
 
 		directive1 := func(ctx context.Context) (any, error) {
 			if ec.directives.Auth == nil {
-				var zeroVal *model.UUID
+				var zeroVal *model.MutationSuccessResponse
 				return zeroVal, errors.New("directive auth is not implemented")
 			}
 			return ec.directives.Auth(ctx, nil, directive0)
@@ -3241,10 +3264,10 @@ func (ec *executionContext) _Mutation_receiptAchievement(ctx context.Context, fi
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*model.UUID); ok {
+		if data, ok := tmp.(*model.MutationSuccessResponse); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.UUID`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.MutationSuccessResponse`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3253,9 +3276,9 @@ func (ec *executionContext) _Mutation_receiptAchievement(ctx context.Context, fi
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.UUID)
+	res := resTmp.(*model.MutationSuccessResponse)
 	fc.Result = res
-	return ec.marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
+	return ec.marshalOMutationSuccessResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMutationSuccessResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_receiptAchievement(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3265,7 +3288,11 @@ func (ec *executionContext) fieldContext_Mutation_receiptAchievement(ctx context
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MutationSuccessResponse_id(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MutationSuccessResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -3302,7 +3329,7 @@ func (ec *executionContext) _Mutation_createProfile(ctx context.Context, field g
 
 		directive1 := func(ctx context.Context) (any, error) {
 			if ec.directives.Auth == nil {
-				var zeroVal *model.UUID
+				var zeroVal *model.MutationSuccessResponse
 				return zeroVal, errors.New("directive auth is not implemented")
 			}
 			return ec.directives.Auth(ctx, nil, directive0)
@@ -3315,10 +3342,10 @@ func (ec *executionContext) _Mutation_createProfile(ctx context.Context, field g
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*model.UUID); ok {
+		if data, ok := tmp.(*model.MutationSuccessResponse); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.UUID`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.MutationSuccessResponse`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3327,9 +3354,9 @@ func (ec *executionContext) _Mutation_createProfile(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.UUID)
+	res := resTmp.(*model.MutationSuccessResponse)
 	fc.Result = res
-	return ec.marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
+	return ec.marshalOMutationSuccessResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMutationSuccessResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createProfile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3339,7 +3366,11 @@ func (ec *executionContext) fieldContext_Mutation_createProfile(ctx context.Cont
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MutationSuccessResponse_id(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MutationSuccessResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -3376,7 +3407,7 @@ func (ec *executionContext) _Mutation_editProfile(ctx context.Context, field gra
 
 		directive1 := func(ctx context.Context) (any, error) {
 			if ec.directives.Auth == nil {
-				var zeroVal *model.UUID
+				var zeroVal *model.MutationSuccessResponse
 				return zeroVal, errors.New("directive auth is not implemented")
 			}
 			return ec.directives.Auth(ctx, nil, directive0)
@@ -3389,10 +3420,10 @@ func (ec *executionContext) _Mutation_editProfile(ctx context.Context, field gra
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*model.UUID); ok {
+		if data, ok := tmp.(*model.MutationSuccessResponse); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.UUID`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.MutationSuccessResponse`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3401,9 +3432,9 @@ func (ec *executionContext) _Mutation_editProfile(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.UUID)
+	res := resTmp.(*model.MutationSuccessResponse)
 	fc.Result = res
-	return ec.marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
+	return ec.marshalOMutationSuccessResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMutationSuccessResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_editProfile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3413,7 +3444,11 @@ func (ec *executionContext) fieldContext_Mutation_editProfile(ctx context.Contex
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MutationSuccessResponse_id(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MutationSuccessResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -3450,7 +3485,7 @@ func (ec *executionContext) _Mutation_createMeal(ctx context.Context, field grap
 
 		directive1 := func(ctx context.Context) (any, error) {
 			if ec.directives.Auth == nil {
-				var zeroVal *model.UUID
+				var zeroVal *model.MutationSuccessResponse
 				return zeroVal, errors.New("directive auth is not implemented")
 			}
 			return ec.directives.Auth(ctx, nil, directive0)
@@ -3463,10 +3498,10 @@ func (ec *executionContext) _Mutation_createMeal(ctx context.Context, field grap
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*model.UUID); ok {
+		if data, ok := tmp.(*model.MutationSuccessResponse); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.UUID`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.MutationSuccessResponse`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3475,9 +3510,9 @@ func (ec *executionContext) _Mutation_createMeal(ctx context.Context, field grap
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.UUID)
+	res := resTmp.(*model.MutationSuccessResponse)
 	fc.Result = res
-	return ec.marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
+	return ec.marshalOMutationSuccessResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMutationSuccessResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createMeal(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3487,7 +3522,11 @@ func (ec *executionContext) fieldContext_Mutation_createMeal(ctx context.Context
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MutationSuccessResponse_id(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MutationSuccessResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -3524,7 +3563,7 @@ func (ec *executionContext) _Mutation_editMeal(ctx context.Context, field graphq
 
 		directive1 := func(ctx context.Context) (any, error) {
 			if ec.directives.Auth == nil {
-				var zeroVal *model.UUID
+				var zeroVal *model.MutationSuccessResponse
 				return zeroVal, errors.New("directive auth is not implemented")
 			}
 			return ec.directives.Auth(ctx, nil, directive0)
@@ -3537,10 +3576,10 @@ func (ec *executionContext) _Mutation_editMeal(ctx context.Context, field graphq
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*model.UUID); ok {
+		if data, ok := tmp.(*model.MutationSuccessResponse); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.UUID`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.MutationSuccessResponse`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3549,9 +3588,9 @@ func (ec *executionContext) _Mutation_editMeal(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.UUID)
+	res := resTmp.(*model.MutationSuccessResponse)
 	fc.Result = res
-	return ec.marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
+	return ec.marshalOMutationSuccessResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMutationSuccessResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_editMeal(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3561,7 +3600,11 @@ func (ec *executionContext) fieldContext_Mutation_editMeal(ctx context.Context, 
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MutationSuccessResponse_id(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MutationSuccessResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -3598,7 +3641,7 @@ func (ec *executionContext) _Mutation_deleteMeal(ctx context.Context, field grap
 
 		directive1 := func(ctx context.Context) (any, error) {
 			if ec.directives.Auth == nil {
-				var zeroVal *model.UUID
+				var zeroVal *model.MutationSuccessResponse
 				return zeroVal, errors.New("directive auth is not implemented")
 			}
 			return ec.directives.Auth(ctx, nil, directive0)
@@ -3611,10 +3654,10 @@ func (ec *executionContext) _Mutation_deleteMeal(ctx context.Context, field grap
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*model.UUID); ok {
+		if data, ok := tmp.(*model.MutationSuccessResponse); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.UUID`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.MutationSuccessResponse`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3623,9 +3666,9 @@ func (ec *executionContext) _Mutation_deleteMeal(ctx context.Context, field grap
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.UUID)
+	res := resTmp.(*model.MutationSuccessResponse)
 	fc.Result = res
-	return ec.marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
+	return ec.marshalOMutationSuccessResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMutationSuccessResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteMeal(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3635,7 +3678,11 @@ func (ec *executionContext) fieldContext_Mutation_deleteMeal(ctx context.Context
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MutationSuccessResponse_id(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MutationSuccessResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -3672,7 +3719,7 @@ func (ec *executionContext) _Mutation_postSkin(ctx context.Context, field graphq
 
 		directive1 := func(ctx context.Context) (any, error) {
 			if ec.directives.Auth == nil {
-				var zeroVal *model.UUID
+				var zeroVal *model.MutationSuccessResponse
 				return zeroVal, errors.New("directive auth is not implemented")
 			}
 			return ec.directives.Auth(ctx, nil, directive0)
@@ -3685,10 +3732,10 @@ func (ec *executionContext) _Mutation_postSkin(ctx context.Context, field graphq
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*model.UUID); ok {
+		if data, ok := tmp.(*model.MutationSuccessResponse); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.UUID`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.MutationSuccessResponse`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3697,9 +3744,9 @@ func (ec *executionContext) _Mutation_postSkin(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.UUID)
+	res := resTmp.(*model.MutationSuccessResponse)
 	fc.Result = res
-	return ec.marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
+	return ec.marshalOMutationSuccessResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMutationSuccessResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_postSkin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3709,7 +3756,11 @@ func (ec *executionContext) fieldContext_Mutation_postSkin(ctx context.Context, 
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MutationSuccessResponse_id(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MutationSuccessResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -3746,7 +3797,7 @@ func (ec *executionContext) _Mutation_useItem(ctx context.Context, field graphql
 
 		directive1 := func(ctx context.Context) (any, error) {
 			if ec.directives.Auth == nil {
-				var zeroVal *model.UUID
+				var zeroVal *model.MutationSuccessResponse
 				return zeroVal, errors.New("directive auth is not implemented")
 			}
 			return ec.directives.Auth(ctx, nil, directive0)
@@ -3759,10 +3810,66 @@ func (ec *executionContext) _Mutation_useItem(ctx context.Context, field graphql
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*model.UUID); ok {
+		if data, ok := tmp.(*model.MutationSuccessResponse); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.UUID`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/moXXcha/hiroyuki_diet_API/graph/model.MutationSuccessResponse`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.MutationSuccessResponse)
+	fc.Result = res
+	return ec.marshalOMutationSuccessResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMutationSuccessResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_useItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MutationSuccessResponse_id(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MutationSuccessResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_useItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MutationSuccessResponse_id(ctx context.Context, field graphql.CollectedField, obj *model.MutationSuccessResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MutationSuccessResponse_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3776,26 +3883,15 @@ func (ec *executionContext) _Mutation_useItem(ctx context.Context, field graphql
 	return ec.marshalOID2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_useItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_MutationSuccessResponse_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Mutation",
+		Object:     "MutationSuccessResponse",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ID does not have child fields")
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_useItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -8682,6 +8778,42 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
+var mutationSuccessResponseImplementors = []string{"MutationSuccessResponse"}
+
+func (ec *executionContext) _MutationSuccessResponse(ctx context.Context, sel ast.SelectionSet, obj *model.MutationSuccessResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mutationSuccessResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MutationSuccessResponse")
+		case "id":
+			out.Values[i] = ec._MutationSuccessResponse_id(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var profileImplementors = []string{"Profile"}
 
 func (ec *executionContext) _Profile(ctx context.Context, sel ast.SelectionSet, obj *model.Profile) graphql.Marshaler {
@@ -10719,6 +10851,13 @@ func (ec *executionContext) marshalOMeal2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalOMutationSuccessResponse2ᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMutationSuccessResponse(ctx context.Context, sel ast.SelectionSet, v *model.MutationSuccessResponse) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._MutationSuccessResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v any) (*string, error) {
