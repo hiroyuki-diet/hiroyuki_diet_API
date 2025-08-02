@@ -113,7 +113,7 @@ type User {
   isTokenAuthenticated: Boolean!
   experiencePoInt: Int!
   exercisies(offset: String!, limit: String!): [Exercise!]
-  meals: [Meal!]
+  meals(offset: String!, limit: String!): [Meal!]
   meal(id: ID!): Meal!
   items: [ItemResponse!]
   hiroyukiSkins(usingSkin: Boolean!): [SkinResponse!]!

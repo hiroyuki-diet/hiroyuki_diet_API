@@ -165,7 +165,7 @@ type ComplexityRoot struct {
 		Items                func(childComplexity int) int
 		Level                func(childComplexity int) int
 		Meal                 func(childComplexity int, id model.UUID) int
-		Meals                func(childComplexity int) int
+		Meals                func(childComplexity int, offset string, limit string) int
 		Profile              func(childComplexity int) int
 		SignUpToken          func(childComplexity int) int
 	}
@@ -201,7 +201,7 @@ type UserResolver interface {
 	Profile(ctx context.Context, obj *model.User) (*model.Profile, error)
 
 	Exercisies(ctx context.Context, obj *model.User, offset string, limit string) ([]*model.Exercise, error)
-	Meals(ctx context.Context, obj *model.User) ([]*model.Meal, error)
+	Meals(ctx context.Context, obj *model.User, offset string, limit string) ([]*model.Meal, error)
 	Meal(ctx context.Context, obj *model.User, id model.UUID) (*model.Meal, error)
 	Items(ctx context.Context, obj *model.User) ([]*model.ItemResponse, error)
 	HiroyukiSkins(ctx context.Context, obj *model.User, usingSkin bool) ([]*model.SkinResponse, error)
@@ -860,7 +860,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			break
 		}
 
-		return e.complexity.User.Meals(childComplexity), true
+		args, err := ec.field_User_meals_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.Meals(childComplexity, args["offset"].(string), args["limit"].(string)), true
 
 	case "User.profile":
 		if e.complexity.User.Profile == nil {
@@ -1483,6 +1488,47 @@ func (ec *executionContext) field_User_meal_argsID(
 	}
 
 	var zeroVal model.UUID
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_User_meals_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_User_meals_argsOffset(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["offset"] = arg0
+	arg1, err := ec.field_User_meals_argsLimit(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["limit"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_User_meals_argsOffset(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+	if tmp, ok := rawArgs["offset"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_User_meals_argsLimit(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+	if tmp, ok := rawArgs["limit"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
 	return zeroVal, nil
 }
 
@@ -5493,7 +5539,7 @@ func (ec *executionContext) _User_meals(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().Meals(rctx, obj)
+		return ec.resolvers.User().Meals(rctx, obj, fc.Args["offset"].(string), fc.Args["limit"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5507,7 +5553,7 @@ func (ec *executionContext) _User_meals(ctx context.Context, field graphql.Colle
 	return ec.marshalOMeal2ᚕᚖgithubᚗcomᚋmoXXchaᚋhiroyuki_diet_APIᚋgraphᚋmodelᚐMealᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_meals(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_meals(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -5526,6 +5572,17 @@ func (ec *executionContext) fieldContext_User_meals(_ context.Context, field gra
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Meal", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_User_meals_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
