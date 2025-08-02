@@ -168,7 +168,7 @@ func (r *userResolver) Exercisies(ctx context.Context, obj *model.User, offset s
 func (r *userResolver) Meals(ctx context.Context, obj *model.User, offset string, limit string) ([]*model.Meal, error) {
 	db := r.DB
 	mealModel := model.Meal{}
-	meals, err := mealModel.GetAll(obj.Id, db)
+	meals, err := mealModel.GetInfos(offset, limit, obj.Id, db)
 	return meals, err
 }
 
