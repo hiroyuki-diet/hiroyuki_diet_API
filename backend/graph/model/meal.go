@@ -16,19 +16,20 @@ type Meal struct {
 	MealType     utils.MealType `gorm:"type: meal_type; not null"`
 	TotalCalorie int            `gorm:"type: int; not null"`
 	Foods        []Food         `gorm:"many2many:food_meals"`
+	Date         time.Time      `gorm:"type: date; not null; default:CURRENT_TIMESTAMP;<-:create"`
 	CreatedAt    time.Time      `gorm:"type: timestamp; autoCreateTime; not null; default:CURRENT_TIMESTAMP;<-:create"`
 	UpdatedAt    time.Time      `gorm:"type: timestamp; autoUpdateTime;<-:update"`
 	DeletedAt    gorm.DeletedAt `gorm:"type: timestamp; index"`
 }
 
-func (*Meal) GetAll(id UUID, db *gorm.DB) ([]*Meal, error) {
+func (*Meal) GetInfos(offset string, limit string, id UUID, db *gorm.DB) ([]*Meal, error) {
 	var meals []*Meal
 
 	if db == nil {
 		return nil, fmt.Errorf("db is nil")
 	}
 
-	err := db.Preload("Foods").Where("user_id = ?", id).Find(&meals).Error
+	err := db.Preload("Foods").Where("user_id = ?", id).Where("date BETWEEN ? AND ?", offset, limit).Order("date asc").Find(&meals).Error
 
 	if err != nil {
 		return nil, err
@@ -216,7 +217,7 @@ func (*Meal) Seeder(db *gorm.DB) error {
 		return err
 	}
 
-	meal := Meal{UserId: user.Id, MealType: "breakfast", TotalCalorie: 1000, Foods: food}
+	meal := Meal{UserId: user.Id, MealType: "breakfast", TotalCalorie: 1000, Date: time.Now(), Foods: food}
 	err = db.Create(&meal).Error
 
 	if err != err {
