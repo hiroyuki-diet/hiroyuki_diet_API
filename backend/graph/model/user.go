@@ -59,8 +59,13 @@ func (*User) Seeder(db *gorm.DB) error {
 	if err != nil {
 		return err
 	}
+	hasedPassword, error := utils.HashPassword("testtest")
 
-	user := User{Email: "konami@example.com", Password: "test", Level: 1, SignUpTokenId: signUpToken.Id, IsTokenAuthenticated: true, ExperiencePoint: 50}
+	if error != nil {
+		return error
+	}
+
+	user := User{Email: "konami@example.com", Password: hasedPassword, Level: 1, SignUpTokenId: signUpToken.Id, IsTokenAuthenticated: true, ExperiencePoint: 50}
 
 	err = db.Create(&user).Error
 
