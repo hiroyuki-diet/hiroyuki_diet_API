@@ -36,6 +36,11 @@ enum GenderEnum {
   man
   woman
 }
+
+type MutationSuccessResponse {
+  id: ID
+}
+
 type Query {
   user(id: ID!): User! @auth
   foods: [Food!]! @auth
@@ -45,17 +50,17 @@ type Mutation {
   signUp(input: Auth!): JWTTokenResponse
   tokenAuth(input: InputTokenAuth!): JWTTokenResponse! @auth
   login(input: Auth!): JWTTokenResponse!
-  logout(input: ID!): ID @auth
-  createExercise(input: InputExercise!): ID @auth
-  editExercise(input: InputExercise!): ID @auth
-  receiptAchievement(input: InputAchievement!): ID @auth
-  createProfile(input: InputProfile!): ID @auth
-  editProfile(input: InputProfile!): ID @auth
-  createMeal(input: InputMeal!): ID @auth
-  editMeal(input: InputMeal!): ID @auth
-  deleteMeal(input: ID!): ID @auth
-  postSkin(input: InputPostSkin!): ID @auth
-  useItem(input: InputUseItem!): ID @auth
+  logout(input: ID!): MutationSuccessResponse @auth
+  createExercise(input: InputExercise!): MutationSuccessResponse @auth
+  editExercise(input: InputExercise!): MutationSuccessResponse @auth
+  receiptAchievement(input: InputAchievement!): MutationSuccessResponse @auth
+  createProfile(input: InputProfile!): MutationSuccessResponse @auth
+  editProfile(input: InputProfile!): MutationSuccessResponse @auth
+  createMeal(input: InputMeal!): MutationSuccessResponse @auth
+  editMeal(input: InputMeal!): MutationSuccessResponse @auth
+  deleteMeal(input: ID!): MutationSuccessResponse @auth
+  postSkin(input: InputPostSkin!): MutationSuccessResponse @auth
+  useItem(input: InputUseItem!): MutationSuccessResponse @auth
 }
 input InputUseItem {
   userId: ID!

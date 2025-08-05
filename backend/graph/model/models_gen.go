@@ -59,5 +59,9 @@ type InputUseItem struct {
 type Mutation struct {
 }
 
+type MutationSuccessResponse struct {
+	ID *UUID `json:"id,omitempty"`
+}
+
 type Query struct {
 }

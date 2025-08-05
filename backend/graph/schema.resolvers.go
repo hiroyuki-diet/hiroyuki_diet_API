@@ -47,88 +47,118 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Auth) (*model.
 }
 
 // Logout is the resolver for the logout field.
-func (r *mutationResolver) Logout(ctx context.Context, input model.UUID) (*model.UUID, error) {
+func (r *mutationResolver) Logout(ctx context.Context, input model.UUID) (*model.MutationSuccessResponse, error) {
 	panic(fmt.Errorf("not implemented: Logout - logout"))
 }
 
 // CreateExercise is the resolver for the createExercise field.
-func (r *mutationResolver) CreateExercise(ctx context.Context, input model.InputExercise) (*model.UUID, error) {
+func (r *mutationResolver) CreateExercise(ctx context.Context, input model.InputExercise) (*model.MutationSuccessResponse, error) {
 	db := r.DB
 	exerciseModel := model.Exercise{}
 	id, err := exerciseModel.Create(input, db)
-	return id, err
+	if err != nil {
+		return nil, err
+	}
+	return &model.MutationSuccessResponse{ID: id}, nil
 }
 
 // EditExercise is the resolver for the editExercise field.
-func (r *mutationResolver) EditExercise(ctx context.Context, input model.InputExercise) (*model.UUID, error) {
+func (r *mutationResolver) EditExercise(ctx context.Context, input model.InputExercise) (*model.MutationSuccessResponse, error) {
 	db := r.DB
 	exerciseModel := model.Exercise{}
 	id, err := exerciseModel.Edit(input, db)
-	return id, err
+	if err != nil {
+		return nil, err
+	}
+	return &model.MutationSuccessResponse{ID: id}, nil
 }
 
 // ReceiptAchievement is the resolver for the receiptAchievement field.
-func (r *mutationResolver) ReceiptAchievement(ctx context.Context, input model.InputAchievement) (*model.UUID, error) {
+func (r *mutationResolver) ReceiptAchievement(ctx context.Context, input model.InputAchievement) (*model.MutationSuccessResponse, error) {
 	db := r.DB
 	achievementModel := model.MasterAchievement{}
 	id, err := achievementModel.Receipt(input, db)
-	return id, err
+	if err != nil {
+		return nil, err
+	}
+	return &model.MutationSuccessResponse{ID: id}, nil
 }
 
 // CreateProfile is the resolver for the createProfile field.
-func (r *mutationResolver) CreateProfile(ctx context.Context, input model.InputProfile) (*model.UUID, error) {
+func (r *mutationResolver) CreateProfile(ctx context.Context, input model.InputProfile) (*model.MutationSuccessResponse, error) {
 	db := r.DB
 	profileModel := model.Profile{}
 	id, err := profileModel.Create(input, db)
-	return id, err
+	if err != nil {
+		return nil, err
+	}
+	return &model.MutationSuccessResponse{ID: id}, nil
 }
 
 // EditProfile is the resolver for the editProfile field.
-func (r *mutationResolver) EditProfile(ctx context.Context, input model.InputProfile) (*model.UUID, error) {
+func (r *mutationResolver) EditProfile(ctx context.Context, input model.InputProfile) (*model.MutationSuccessResponse, error) {
 	db := r.DB
 	profileModel := model.Profile{}
 	id, err := profileModel.Edit(input, db)
-	return id, err
+	if err != nil {
+		return nil, err
+	}
+	return &model.MutationSuccessResponse{ID: id}, nil
 }
 
 // CreateMeal is the resolver for the createMeal field.
-func (r *mutationResolver) CreateMeal(ctx context.Context, input model.InputMeal) (*model.UUID, error) {
+func (r *mutationResolver) CreateMeal(ctx context.Context, input model.InputMeal) (*model.MutationSuccessResponse, error) {
 	db := r.DB
 	mealModel := model.Meal{}
 	id, err := mealModel.Create(input, db)
-	return id, err
+	if err != nil {
+		return nil, err
+	}
+	return &model.MutationSuccessResponse{ID: id}, nil
 }
 
 // EditMeal is the resolver for the editMeal field.
-func (r *mutationResolver) EditMeal(ctx context.Context, input model.InputMeal) (*model.UUID, error) {
+func (r *mutationResolver) EditMeal(ctx context.Context, input model.InputMeal) (*model.MutationSuccessResponse, error) {
 	db := r.DB
 	mealModel := model.Meal{}
 	id, err := mealModel.Edit(input, db)
-	return id, err
+	if err != nil {
+		return nil, err
+	}
+	return &model.MutationSuccessResponse{ID: id}, nil
 }
 
 // DeleteMeal is the resolver for the deleteMeal field.
-func (r *mutationResolver) DeleteMeal(ctx context.Context, input model.UUID) (*model.UUID, error) {
+func (r *mutationResolver) DeleteMeal(ctx context.Context, input model.UUID) (*model.MutationSuccessResponse, error) {
 	db := r.DB
 	mealModel := model.Meal{}
 	id, err := mealModel.Delete(input, db)
-	return id, err
+	if err != nil {
+		return nil, err
+	}
+	return &model.MutationSuccessResponse{ID: id}, nil
 }
 
 // PostSkin is the resolver for the postSkin field.
-func (r *mutationResolver) PostSkin(ctx context.Context, input model.InputPostSkin) (*model.UUID, error) {
+func (r *mutationResolver) PostSkin(ctx context.Context, input model.InputPostSkin) (*model.MutationSuccessResponse, error) {
 	db := r.DB
 	skinModel := model.MasterHiroyukiSkin{}
 	id, err := skinModel.Post(input, db)
-	return id, err
+	if err != nil {
+		return nil, err
+	}
+	return &model.MutationSuccessResponse{ID: id}, nil
 }
 
 // UseItem is the resolver for the useItem field.
-func (r *mutationResolver) UseItem(ctx context.Context, input model.InputUseItem) (*model.UUID, error) {
+func (r *mutationResolver) UseItem(ctx context.Context, input model.InputUseItem) (*model.MutationSuccessResponse, error) {
 	db := r.DB
 	itemModel := model.MasterItem{}
 	id, err := itemModel.Use(input, db)
-	return id, err
+	if err != nil {
+		return nil, err
+	}
+	return &model.MutationSuccessResponse{ID: id}, nil
 }
 
 // User is the resolver for the user field.
@@ -159,7 +189,6 @@ func (r *userResolver) Profile(ctx context.Context, obj *model.User) (*model.Pro
 func (r *userResolver) Exercisies(ctx context.Context, obj *model.User, offset string, limit string) ([]*model.Exercise, error) {
 	db := r.DB
 	exercise := model.Exercise{}
-
 	exercises, err := exercise.GetInfo(obj.Id, offset, limit, db)
 	return exercises, err
 }
