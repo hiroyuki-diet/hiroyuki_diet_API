@@ -1,0 +1,205 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+directive @auth on FIELD_DEFINITION
+
+enum FieldEnum {
+  login
+  signin
+  home
+  meal
+  meal_form
+  meal_edit
+  data
+  profile
+  profile_edit
+  exercise
+  eexercise_complete
+  achievement
+  achievement_complete
+  chibi_hiroyuki
+}
+enum SkinPartEnum {
+  head
+  face
+  body
+}
+
+enum MealTypeEnum {
+  breakfast
+  lunch
+  dinner
+  snacking
+}
+
+enum GenderEnum {
+  man
+  woman
+}
+
+type MutationSuccessResponse {
+  id: ID
+}
+
+type Query {
+  user(id: ID!): User! @auth
+  foods: [Food!]! @auth
+}
+
+type Mutation {
+  signUp(input: Auth!): JWTTokenResponse
+  tokenAuth(input: InputTokenAuth!): JWTTokenResponse! @auth
+  login(input: Auth!): JWTTokenResponse!
+  logout(input: ID!): MutationSuccessResponse @auth
+  createExercise(input: InputExercise!): MutationSuccessResponse @auth
+  editExercise(input: InputExercise!): MutationSuccessResponse @auth
+  receiptAchievement(input: InputAchievement!): MutationSuccessResponse @auth
+  createProfile(input: InputProfile!): MutationSuccessResponse @auth
+  editProfile(input: InputProfile!): MutationSuccessResponse @auth
+  createMeal(input: InputMeal!): MutationSuccessResponse @auth
+  editMeal(input: InputMeal!): MutationSuccessResponse @auth
+  deleteMeal(input: ID!): MutationSuccessResponse @auth
+  postSkin(input: InputPostSkin!): MutationSuccessResponse @auth
+  useItem(input: InputUseItem!): MutationSuccessResponse @auth
+}
+input InputUseItem {
+  userId: ID!
+  itemId: ID!
+  count: Int!
+}
+
+input InputTokenAuth {
+  userId: ID!
+  token: Int!
+}
+
+input InputPostSkin {
+  userId: ID!
+  skinId: ID!
+}
+
+input InputAchievement {
+  userId: ID!
+  achievementId: ID!
+}
+
+input Auth {
+  email: String!
+  password: String!
+}
+input InputExercise {
+  userId: ID
+  time: Int!
+}
+input InputProfile {
+  userId: ID!
+  userName: String!
+  age: Int!
+  gender: String!
+  weight: Int!
+  height: Int!
+  targetWeight: Int!
+  targetDailyExerciseTime: Int!
+  targetDailyCarorie: Int!
+}
+input InputMeal {
+  userId: ID
+  mealId: ID
+  mealType: MealTypeEnum!
+  foods: [ID!]!
+}
+
+type User {
+  id: ID!
+  email: String!
+  profile: Profile!
+  level: Int!
+  signUpToken: SignUpToken!
+  isTokenAuthenticated: Boolean!
+  experiencePoInt: Int!
+  exercisies(offset: String!, limit: String!): [Exercise!]
+  meals(offset: String!, limit: String!): [Meal!]
+  meal(id: ID!): Meal!
+  items: [ItemResponse!]
+  hiroyukiSkins(usingSkin: Boolean!): [SkinResponse!]!
+  achievements: [AchievementResponse!]!
+  hiroyukiVoicies(fields: [FieldEnum!]!): [HiroyukiVoiceResponse!]!
+}
+
+type HiroyukiVoiceResponse {
+  id: ID!
+  name: String!
+  voiceUrl: String!
+  releaseLevel: Int!
+  fields: [FieldEnum!]!
+  isHaving: Boolean!
+}
+type AchievementResponse {
+  id: ID!
+  name: String!
+  isClear: Boolean!
+}
+
+type SkinResponse {
+  id: ID!
+  name: String!
+  description: String!
+  part: SkinPartEnum!
+  skinImage: String!
+  releaseLevel: Int!
+  isUsing: Boolean!
+  isHaving: Boolean!
+}
+
+type ItemResponse {
+  id: ID!
+  name: String!
+  description: String!
+  itemImage: String!
+  count: Int!
+}
+
+type Meal {
+  id: ID!
+  mealType: MealTypeEnum!
+  totalCalorie: Int!
+  foods: [Food!]!
+}
+
+type SignUpToken {
+  id: ID!
+  token: Int!
+  surviveTime: Int!
+}
+
+type Exercise {
+  id: ID!
+  time: Int!
+  date: String!
+}
+
+type Profile {
+  id: ID!
+  userName: String!
+  age: Int!
+  gender: GenderEnum!
+  weight: Int!
+  height: Int!
+  targetWeight: Int!
+  targetDailyExerciseTime: Int!
+  targetDailyCarorie: Int!
+  isCreated: Boolean!
+  favorability: Int
+}
+
+type Food {
+  id: ID!
+  name: String!
+  estimateCalorie: Int!
+  lastUsedDate: String!
+}
+
+type JWTTokenResponse {
+  userId: ID!
+  token: String!
+}
