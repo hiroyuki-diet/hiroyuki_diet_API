@@ -1,0 +1,28 @@
+version: "3"
+
+tasks:
+  default:
+    cmds:
+      - echo Hello, World!
+
+  up:
+    cmds:
+      - docker compose up -d
+
+  down:
+    cmds:
+      - docker compose down
+
+  init:
+    cmds:
+      - docker compose down --rmi all --volumes --remove-orphans
+      - docker compose up -d
+
+  build:
+    cmds:
+      - docker compose build
+
+  generate:
+    dir: ./app
+    cmds:
+      - docker exec hiroyuki_diet_app go run github.com/99designs/gqlgen run
