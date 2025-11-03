@@ -16,6 +16,7 @@
       - [3. ユーザー情報の取得 (認証が必要)](#3-ユーザー情報の取得-認証が必要)
   - [GraphQL スキーマ](#graphql-スキーマ)
   - [シーダーの実行方法](#シーダーの実行方法)
+  - [AWS へのデプロイ](#aws-へのデプロイ)
 
 ## 必要要件
 
@@ -328,3 +329,22 @@ type JWTTokenResponse {
     ```bash
     go run main.go
     ```
+
+## AWS へのデプロイ
+
+このプロジェクトは GitHub Actions を使用して AWS ECS (Fargate) に自動デプロイできます。
+
+詳細なセットアップ手順は [DEPLOY.md](./DEPLOY.md) を参照してください。
+
+### クイックスタート
+
+1. AWS リソースのセットアップ（ECR, ECS, RDS など）
+2. GitHub Secrets に `AWS_ACCESS_KEY_ID` と `AWS_SECRET_ACCESS_KEY` を設定
+3. `.aws/task-definition.json` を実際の値に更新
+4. main ブランチに push すると自動デプロイが実行されます
+
+```bash
+git push origin main
+```
+
+GitHub Actions でデプロイの進行状況を確認できます。
