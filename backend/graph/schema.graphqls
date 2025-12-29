@@ -14,7 +14,7 @@ enum FieldEnum {
   profile
   profile_edit
   exercise
-  eexercise_complete
+  exercise_complete
   achievement
   achievement_complete
   chibi_hiroyuki
@@ -41,6 +41,11 @@ type MutationSuccessResponse {
   id: ID
 }
 
+type ExerciseMutationResponse {
+  id: ID
+  newAchievements: [String!]!
+}
+
 type Query {
   user(id: ID!): User! @auth
   foods: [Food!]! @auth
@@ -49,10 +54,10 @@ type Query {
 type Mutation {
   signUp(input: Auth!): JWTTokenResponse
   tokenAuth(input: InputTokenAuth!): JWTTokenResponse! @auth
-  login(input: Auth!): JWTTokenResponse!
+  login(input: Auth!): LoginResponse!
   logout(input: ID!): MutationSuccessResponse @auth
-  createExercise(input: InputExercise!): MutationSuccessResponse @auth
-  editExercise(input: InputExercise!): MutationSuccessResponse @auth
+  createExercise(input: InputExercise!): ExerciseMutationResponse @auth
+  editExercise(input: InputExercise!): ExerciseMutationResponse @auth
   receiptAchievement(input: InputAchievement!): MutationSuccessResponse @auth
   createProfile(input: InputProfile!): MutationSuccessResponse @auth
   editProfile(input: InputProfile!): MutationSuccessResponse @auth
@@ -61,6 +66,7 @@ type Mutation {
   deleteMeal(input: ID!): MutationSuccessResponse @auth
   postSkin(input: InputPostSkin!): MutationSuccessResponse @auth
   useItem(input: InputUseItem!): MutationSuccessResponse @auth
+  updateWeight(input: InputUpdateWeight!): MutationSuccessResponse @auth
 }
 input InputUseItem {
   userId: ID!
@@ -90,6 +96,7 @@ input Auth {
 input InputExercise {
   userId: ID
   time: Int!
+  isCompleted: Boolean
 }
 input InputProfile {
   userId: ID!
@@ -109,6 +116,11 @@ input InputMeal {
   foods: [ID!]!
 }
 
+input InputUpdateWeight {
+  userId: ID!
+  weight: Int!
+}
+
 type User {
   id: ID!
   email: String!
@@ -117,9 +129,11 @@ type User {
   signUpToken: SignUpToken!
   isTokenAuthenticated: Boolean!
   experiencePoInt: Int!
+  weightRecordedAt: String
   exercisies(offset: String!, limit: String!): [Exercise!]
   meals(offset: String!, limit: String!): [Meal!]
   meal(id: ID!): Meal!
+  weightHistories(offset: String!, limit: String!): [WeightHistory!]
   items: [ItemResponse!]
   hiroyukiSkins(usingSkin: Boolean!): [SkinResponse!]!
   achievements: [AchievementResponse!]!
@@ -137,6 +151,7 @@ type HiroyukiVoiceResponse {
 type AchievementResponse {
   id: ID!
   name: String!
+  description: String!
   isClear: Boolean!
 }
 
@@ -164,6 +179,7 @@ type Meal {
   mealType: MealTypeEnum!
   totalCalorie: Int!
   foods: [Food!]!
+  date: String!
 }
 
 type SignUpToken {
@@ -175,6 +191,13 @@ type SignUpToken {
 type Exercise {
   id: ID!
   time: Int!
+  date: String!
+  isCompleted: Boolean!
+}
+
+type WeightHistory {
+  id: ID!
+  weight: Int!
   date: String!
 }
 
@@ -202,4 +225,10 @@ type Food {
 type JWTTokenResponse {
   userId: ID!
   token: String!
+}
+
+type LoginResponse {
+  userId: ID!
+  token: String!
+  newAchievements: [String!]!
 }

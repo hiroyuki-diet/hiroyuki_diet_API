@@ -14,8 +14,8 @@ import (
 
 type MasterHiroyukiVoice struct {
 	Id           UUID           `gorm:"primary_key; type: uuid; not null; default:uuid_generate_v4()"`
-	Name         string         `gorm:"type: varchar(50); not null"`
-	VoiceUrl     string         `gorm:"type: varchar(50); not null"`
+	Name         string         `gorm:"type: text; not null"`
+	VoiceUrl     string         `gorm:"type: text; not null"`
 	ReleaseLevel int            `gorm:"type: int; not null"`
 	VoiceFields  []MasterField  `gorm:"many2many:voice_fields"`
 	CreatedAt    time.Time      `gorm:"type: timestamp; autoCreateTime; not null; default:CURRENT_TIMESTAMP;<-:create"`
@@ -82,12 +82,12 @@ func (*MasterHiroyukiVoice) FirstCreate(db *gorm.DB) error {
 		}
 
 		// CSVファイルを開く
-		file, err := os.Open("seeder/master_voice.csv")
+		file, err := os.Open("seeder/voice.csv")
 		if err != nil {
 			// docker-composeからの実行パスを考慮
-			file, err = os.Open("backend/seeder/master_voice.csv")
+			file, err = os.Open("backend/seeder/voice.csv")
 			if err != nil {
-				return fmt.Errorf("failed to open master_voice.csv: %w", err)
+				return fmt.Errorf("failed to open voice.csv: %w", err)
 			}
 		}
 		defer file.Close()

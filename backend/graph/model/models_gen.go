@@ -17,8 +17,9 @@ type InputAchievement struct {
 }
 
 type InputExercise struct {
-	UserID *UUID `json:"userId,omitempty"`
-	Time   int   `json:"time"`
+	UserID      *UUID `json:"userId,omitempty"`
+	Time        int   `json:"time"`
+	IsCompleted *bool `json:"isCompleted,omitempty"`
 }
 
 type InputMeal struct {
@@ -48,6 +49,11 @@ type InputProfile struct {
 type InputTokenAuth struct {
 	UserID UUID `json:"userId"`
 	Token  int  `json:"token"`
+}
+
+type InputUpdateWeight struct {
+	UserID UUID `json:"userId"`
+	Weight int  `json:"weight"`
 }
 
 type InputUseItem struct {

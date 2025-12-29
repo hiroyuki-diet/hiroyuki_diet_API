@@ -10,6 +10,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var jst = time.FixedZone("JST", 9*60*60)
+
 type User struct {
 	Id                   UUID           `gorm:"primary_key; type: uuid; not null; default:uuid_generate_v4()"`
 	Email                string         `gorm:"type: varchar(50); not null"`
@@ -19,6 +21,7 @@ type User struct {
 	SignUpToken          SignUpToken    `gorm:"foreignKey:SignUpTokenId;references:Id"`
 	IsTokenAuthenticated bool           `gorm:"type: bool; not null; default: false"`
 	ExperiencePoint      int            `gorm:"type: int; not null; default: 0"`
+	WeightRecordedAt     *time.Time     `gorm:"type: date"`
 	CreatedAt            time.Time      `gorm:"type: timestamp; autoCreateTime; not null; default:CURRENT_TIMESTAMP;<-:create"`
 	UpdatedAt            time.Time      `gorm:"type: timestamp; autoUpdateTime;<-:update"`
 	DeletedAt            gorm.DeletedAt `gorm:"type: timestamp; index"`
@@ -240,4 +243,74 @@ func (*User) Login(input Auth, db *gorm.DB) (*JWTTokenResponse, error) {
 		UserId: user.Id,
 		Token:  token,
 	}, nil
+}
+
+func (*User) Logout(id UUID, db *gorm.DB) (*MutationSuccessResponse, error) {
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	var user User
+	if err := db.Where("id = ?", id).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("ユーザーが見つかりません")
+		}
+		return nil, err
+	}
+
+	return &MutationSuccessResponse{ID: &user.Id}, nil
+}
+
+func (*User) UpdateWeight(input InputUpdateWeight, db *gorm.DB) (*MutationSuccessResponse, error) {
+	if db == nil {
+		return nil, fmt.Errorf("db is nil")
+	}
+
+	tx := db.Begin()
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	// Update profile weight
+	var profile Profile
+	if err := tx.Where("user_id = ?", input.UserID).First(&profile).Error; err != nil {
+		tx.Rollback()
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("プロフィールが見つかりません")
+		}
+		return nil, err
+	}
+
+	if err := tx.Model(&Profile{}).Where("user_id = ?", input.UserID).Update("weight", input.Weight).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// Update user's weight_recorded_at (use JST for consistency with client)
+	now := time.Now().In(jst)
+	if err := tx.Model(&User{}).Where("id = ?", input.UserID).Update("weight_recorded_at", now).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// Create weight history entry
+	weightHistory := WeightHistory{}
+	if _, err := weightHistory.Create(input.UserID, input.Weight, tx); err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return nil, err
+	}
+
+	return &MutationSuccessResponse{ID: &profile.Id}, nil
+}
+
+func UpdateWeightRecordedAt(userId UUID, db *gorm.DB) error {
+	if db == nil {
+		return fmt.Errorf("db is nil")
+	}
+	now := time.Now().In(jst)
+	return db.Model(&User{}).Where("id = ?", userId).Update("weight_recorded_at", now).Error
 }

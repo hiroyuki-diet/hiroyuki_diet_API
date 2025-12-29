@@ -1,7 +1,10 @@
 package model
 
 import (
+	"encoding/csv"
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 
 	"gorm.io/gorm"
@@ -43,15 +46,49 @@ func (*Food) Seeder(db *gorm.DB) error {
 			return nil
 		}
 
-		t, err := time.Parse("2006-01-02", "2025-07-01")
+		// CSVファイルを開く
+		file, err := os.Open("seeder/foods.csv")
+		if err != nil {
+			return fmt.Errorf("failed to open foods.csv: %w", err)
+		}
+		defer file.Close()
 
+		reader := csv.NewReader(file)
+		records, err := reader.ReadAll()
+		if err != nil {
+			return fmt.Errorf("failed to read foods.csv: %w", err)
+		}
+
+		defaultDate, err := time.Parse("2006-01-02", "2025-01-01")
 		if err != nil {
 			return err
 		}
 
-		food := Food{Name: "たこやき", EstimateCalorie: 1000, LastUsedDate: t}
-		if err := tx.Create(&food).Error; err != nil {
-			return err
+		// ヘッダー行をスキップしてデータを処理
+		for i, record := range records {
+			if i == 0 {
+				continue // ヘッダー行をスキップ
+			}
+
+			if len(record) < 2 {
+				continue
+			}
+
+			name := record[0]
+			calorie, err := strconv.Atoi(record[1])
+			if err != nil {
+				return fmt.Errorf("failed to parse calorie for %s: %w", name, err)
+			}
+
+			food := Food{
+				Name:            name,
+				EstimateCalorie: calorie,
+				LastUsedDate:    defaultDate,
+			}
+
+			if err := tx.Create(&food).Error; err != nil {
+				return fmt.Errorf("failed to create food %s: %w", name, err)
+			}
 		}
 
 		return nil

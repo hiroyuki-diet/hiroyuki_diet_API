@@ -8,6 +8,7 @@ tasks:
   up:
     cmds:
       - docker compose up -d
+      - docker exec -it hiroyuki_diet_app go run .
 
   down:
     cmds:

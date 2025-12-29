@@ -22,9 +22,10 @@ type SkinResponse struct {
 }
 
 type AchievementResponse struct {
-	Id      UUID
-	Name    string
-	IsClear bool
+	Id          UUID
+	Name        string
+	Description string
+	IsClear     bool
 }
 
 type HiroyukiVoiceResponse struct {
@@ -39,4 +40,15 @@ type HiroyukiVoiceResponse struct {
 type JWTTokenResponse struct {
 	UserId UUID
 	Token  string
+}
+
+type ExerciseMutationResponse struct {
+	ID              *UUID
+	NewAchievements []string
+}
+
+type LoginResponse struct {
+	UserId          UUID
+	Token           string
+	NewAchievements []string
 }

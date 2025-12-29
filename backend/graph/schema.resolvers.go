@@ -6,21 +6,31 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"time"
 
+	"github.com/moXXcha/hiroyuki_diet_API/graph/achievement"
 	"github.com/moXXcha/hiroyuki_diet_API/graph/model"
 	"github.com/moXXcha/hiroyuki_diet_API/utils"
 )
 
+var jst = time.FixedZone("JST", 9*60*60)
+
 // Date is the resolver for the date field.
 func (r *exerciseResolver) Date(ctx context.Context, obj *model.Exercise) (string, error) {
-	return obj.Date.Format("2006-01-02"), nil
+	// Format in JST for consistency with client timezone
+	return obj.Date.In(jst).Format("2006-01-02"), nil
 }
 
 // LastUsedDate is the resolver for the lastUsedDate field.
 func (r *foodResolver) LastUsedDate(ctx context.Context, obj *model.Food) (string, error) {
 	date := obj.LastUsedDate.Format("2006-01-02")
 	return date, nil
+}
+
+// Date is the resolver for the date field.
+func (r *mealResolver) Date(ctx context.Context, obj *model.Meal) (string, error) {
+	// Format in JST for consistency with client timezone
+	return obj.Date.In(jst).Format("2006-01-02"), nil
 }
 
 // SignUp is the resolver for the signUp field.
@@ -40,37 +50,65 @@ func (r *mutationResolver) TokenAuth(ctx context.Context, input model.InputToken
 }
 
 // Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, input model.Auth) (*model.JWTTokenResponse, error) {
+func (r *mutationResolver) Login(ctx context.Context, input model.Auth) (*model.LoginResponse, error) {
 	db := r.DB
 	userModel := model.User{}
-	return userModel.Login(input, db)
+	jwtResponse, err := userModel.Login(input, db)
+	if err != nil {
+		return nil, err
+	}
+
+	// Record login history
+	model.RecordLogin(jwtResponse.UserId, db)
+
+	// Check for login achievements
+	checker := achievement.NewAchievementChecker(db)
+	newAchievements, _ := checker.CheckLoginAchievements(jwtResponse.UserId)
+
+	return &model.LoginResponse{
+		UserId:          jwtResponse.UserId,
+		Token:           jwtResponse.Token,
+		NewAchievements: newAchievements,
+	}, nil
 }
 
 // Logout is the resolver for the logout field.
 func (r *mutationResolver) Logout(ctx context.Context, input model.UUID) (*model.MutationSuccessResponse, error) {
-	panic(fmt.Errorf("not implemented: Logout - logout"))
+	db := r.DB
+	userModel := model.User{}
+	return userModel.Logout(input, db)
 }
 
 // CreateExercise is the resolver for the createExercise field.
-func (r *mutationResolver) CreateExercise(ctx context.Context, input model.InputExercise) (*model.MutationSuccessResponse, error) {
+func (r *mutationResolver) CreateExercise(ctx context.Context, input model.InputExercise) (*model.ExerciseMutationResponse, error) {
 	db := r.DB
 	exerciseModel := model.Exercise{}
 	id, err := exerciseModel.Create(input, db)
 	if err != nil {
 		return nil, err
 	}
-	return &model.MutationSuccessResponse{ID: id}, nil
+
+	// Check for newly achieved achievements
+	checker := achievement.NewAchievementChecker(db)
+	newAchievements, _ := checker.CheckExerciseAchievements(*input.UserID)
+
+	return &model.ExerciseMutationResponse{ID: id, NewAchievements: newAchievements}, nil
 }
 
 // EditExercise is the resolver for the editExercise field.
-func (r *mutationResolver) EditExercise(ctx context.Context, input model.InputExercise) (*model.MutationSuccessResponse, error) {
+func (r *mutationResolver) EditExercise(ctx context.Context, input model.InputExercise) (*model.ExerciseMutationResponse, error) {
 	db := r.DB
 	exerciseModel := model.Exercise{}
 	id, err := exerciseModel.Edit(input, db)
 	if err != nil {
 		return nil, err
 	}
-	return &model.MutationSuccessResponse{ID: id}, nil
+
+	// Check for newly achieved achievements
+	checker := achievement.NewAchievementChecker(db)
+	newAchievements, _ := checker.CheckExerciseAchievements(*input.UserID)
+
+	return &model.ExerciseMutationResponse{ID: id, NewAchievements: newAchievements}, nil
 }
 
 // ReceiptAchievement is the resolver for the receiptAchievement field.
@@ -92,6 +130,11 @@ func (r *mutationResolver) CreateProfile(ctx context.Context, input model.InputP
 	if err != nil {
 		return nil, err
 	}
+	// Update weight_recorded_at when profile is created with weight
+	model.UpdateWeightRecordedAt(input.UserID, db)
+	// Create weight history entry
+	weightHistory := model.WeightHistory{}
+	weightHistory.Create(input.UserID, input.Weight, db)
 	return &model.MutationSuccessResponse{ID: id}, nil
 }
 
@@ -103,6 +146,11 @@ func (r *mutationResolver) EditProfile(ctx context.Context, input model.InputPro
 	if err != nil {
 		return nil, err
 	}
+	// Update weight_recorded_at when profile weight is edited
+	model.UpdateWeightRecordedAt(input.UserID, db)
+	// Create weight history entry
+	weightHistory := model.WeightHistory{}
+	weightHistory.Create(input.UserID, input.Weight, db)
 	return &model.MutationSuccessResponse{ID: id}, nil
 }
 
@@ -161,6 +209,13 @@ func (r *mutationResolver) UseItem(ctx context.Context, input model.InputUseItem
 	return &model.MutationSuccessResponse{ID: id}, nil
 }
 
+// UpdateWeight is the resolver for the updateWeight field.
+func (r *mutationResolver) UpdateWeight(ctx context.Context, input model.InputUpdateWeight) (*model.MutationSuccessResponse, error) {
+	db := r.DB
+	userModel := model.User{}
+	return userModel.UpdateWeight(input, db)
+}
+
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, id model.UUID) (*model.User, error) {
 	db := r.DB
@@ -185,6 +240,16 @@ func (r *userResolver) Profile(ctx context.Context, obj *model.User) (*model.Pro
 	return profile, err
 }
 
+// WeightRecordedAt is the resolver for the weightRecordedAt field.
+func (r *userResolver) WeightRecordedAt(ctx context.Context, obj *model.User) (*string, error) {
+	if obj.WeightRecordedAt == nil {
+		return nil, nil
+	}
+	// Format in JST for consistency with client timezone
+	date := obj.WeightRecordedAt.In(jst).Format("2006-01-02")
+	return &date, nil
+}
+
 // Exercisies is the resolver for the exercisies field.
 func (r *userResolver) Exercisies(ctx context.Context, obj *model.User, offset string, limit string) ([]*model.Exercise, error) {
 	db := r.DB
@@ -207,6 +272,14 @@ func (r *userResolver) Meal(ctx context.Context, obj *model.User, id model.UUID)
 	mealModel := model.Meal{}
 	meal, err := mealModel.GetById(id, db)
 	return meal, err
+}
+
+// WeightHistories is the resolver for the weightHistories field.
+func (r *userResolver) WeightHistories(ctx context.Context, obj *model.User, offset string, limit string) ([]*model.WeightHistory, error) {
+	db := r.DB
+	weightHistoryModel := model.WeightHistory{}
+	histories, err := weightHistoryModel.GetHistories(offset, limit, obj.Id, db)
+	return histories, err
 }
 
 // Items is the resolver for the items field.
@@ -241,11 +314,20 @@ func (r *userResolver) HiroyukiVoicies(ctx context.Context, obj *model.User, fie
 	return voices, err
 }
 
+// Date is the resolver for the date field.
+func (r *weightHistoryResolver) Date(ctx context.Context, obj *model.WeightHistory) (string, error) {
+	// Format in JST for consistency with client timezone
+	return obj.Date.In(jst).Format("2006-01-02"), nil
+}
+
 // Exercise returns ExerciseResolver implementation.
 func (r *Resolver) Exercise() ExerciseResolver { return &exerciseResolver{r} }
 
 // Food returns FoodResolver implementation.
 func (r *Resolver) Food() FoodResolver { return &foodResolver{r} }
+
+// Meal returns MealResolver implementation.
+func (r *Resolver) Meal() MealResolver { return &mealResolver{r} }
 
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
@@ -256,8 +338,29 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 // User returns UserResolver implementation.
 func (r *Resolver) User() UserResolver { return &userResolver{r} }
 
+// WeightHistory returns WeightHistoryResolver implementation.
+func (r *Resolver) WeightHistory() WeightHistoryResolver { return &weightHistoryResolver{r} }
+
 type exerciseResolver struct{ *Resolver }
 type foodResolver struct{ *Resolver }
+type mealResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
+type weightHistoryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *achievementResponseResolver) Description(ctx context.Context, obj *model.AchievementResponse) (string, error) {
+	return obj.Description, nil
+}
+func (r *Resolver) AchievementResponse() AchievementResponseResolver {
+	return &achievementResponseResolver{r}
+}
+type achievementResponseResolver struct{ *Resolver }
+*/

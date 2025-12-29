@@ -35,9 +35,12 @@ func (*Profile) GetInfo(id UUID, db *gorm.DB) (*Profile, error) {
 		return nil, fmt.Errorf("db is nil")
 	}
 
-	result := db.First(&profile)
+	result := db.Where("user_id = ?", id).First(&profile)
 
 	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("PROFILE_NOT_FOUND")
+		}
 		return nil, result.Error
 	}
 

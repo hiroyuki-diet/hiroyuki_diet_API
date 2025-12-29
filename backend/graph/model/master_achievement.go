@@ -77,13 +77,16 @@ func (*MasterAchievement) GetAchievement(id UUID, db *gorm.DB) ([]*AchievementRe
 		Select(`
 			master_achievements.id,
 			master_achievements.name,
-			COALESCE(user_achievements.is_clear, false) AS is_clear
+			master_achievements.description,
+			CASE WHEN user_achievements.id IS NOT NULL THEN true ELSE false END AS is_clear
 		`).
 		Joins(`
-			LEFT JOIN user_achievements 
-			ON master_achievements.id = user_achievements.achievement_id 
+			LEFT JOIN user_achievements
+			ON master_achievements.id = user_achievements.achievement_id
 			AND user_achievements.user_id = ?
+			AND user_achievements.deleted_at IS NULL
 		`, id).
+		Where("master_achievements.deleted_at IS NULL").
 		Scan(&achievements).Error
 
 	return achievements, err

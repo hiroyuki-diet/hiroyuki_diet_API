@@ -28,7 +28,7 @@ func main() {
 
 	db := utils.InitDB()
 	resolver := graph.NewResolver(db)
-	db.AutoMigrate(&model.Exercise{}, &model.Food{}, &model.MasterAchievement{}, &model.MasterExercise{}, &model.MasterField{}, &model.MasterHiroyukiSkin{}, &model.MasterHiroyukiVoice{}, &model.MasterItem{}, &model.Meal{}, &model.Profile{}, &model.SignUpToken{}, &model.UserAchievement{}, &model.UserHiroyukiVoice{}, &model.UserItem{}, &model.UserSkin{}, &model.User{})
+	db.AutoMigrate(&model.Exercise{}, &model.Food{}, &model.LoginHistory{}, &model.MasterAchievement{}, &model.MasterExercise{}, &model.MasterField{}, &model.MasterHiroyukiSkin{}, &model.MasterHiroyukiVoice{}, &model.MasterItem{}, &model.Meal{}, &model.Profile{}, &model.SignUpToken{}, &model.UserAchievement{}, &model.UserHiroyukiVoice{}, &model.UserItem{}, &model.UserSkin{}, &model.User{}, &model.WeightHistory{})
 
 	fmt.Println("db migrated")
 
@@ -38,8 +38,15 @@ func main() {
 	hiroyukiSkin := model.MasterHiroyukiSkin{}
 	hiroyukiVoice := model.MasterHiroyukiVoice{}
 	item := model.MasterItem{}
+	food := model.Food{}
 
 	var err error
+	err = food.Seeder(db)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	err = achievement.FirstCreate(db)
 
 	if err != nil {
